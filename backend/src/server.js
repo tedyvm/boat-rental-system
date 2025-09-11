@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const { protect, admin } = require("./middleware/authMiddleware");
+
 require("dotenv").config();
 
 const app = express();
@@ -31,3 +33,7 @@ mongoose
     );
   })
   .catch((err) => console.error(err));
+
+app.get("/api/test", protect, (req, res) => {
+  res.json({ message: `Hello ${req.user.username}!` });
+});
