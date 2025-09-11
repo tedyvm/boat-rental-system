@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const boatRoutes = require("./routes/boatRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const { protect, admin } = require("./middleware/authMiddleware");
 
 require("dotenv").config();
@@ -14,11 +17,13 @@ app.use(express.json());
 
 // Auth routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/boats", boatRoutes);
+app.use("/api/admin", adminRoutes);
 
-// Routes placeholder
-app.get("/", (req, res) => {
-  res.send("Boat Rental Backend is running!");
-});
+  
+
+
 
 // Connect to MongoDB and start server
 mongoose
