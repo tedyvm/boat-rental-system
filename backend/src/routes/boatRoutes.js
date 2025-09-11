@@ -4,18 +4,14 @@ const { protect, admin } = require("../middleware/authMiddleware");
 const {
   getBoats,
   getBoatById,
-  createBoat,
-  updateBoat,
-  deleteBoat,
+  searchBoats,
 } = require("../controllers/boatController");
 
+
 // Public
+router.get("/search", searchBoats);
 router.get("/", getBoats);
 router.get("/:id", getBoatById);
 
-// Admin
-router.post("/", protect, admin, createBoat);
-router.put("/:id", protect, admin, updateBoat);
-router.delete("/:id", protect, admin, deleteBoat);
 
 module.exports = router;
