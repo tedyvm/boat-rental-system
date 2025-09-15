@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const boatRoutes = require("./routes/boatRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const reservationRoutes = require("./routes/reservationRoutes");
 const { protect, admin } = require("./middleware/authMiddleware");
 
 require("dotenv").config();
@@ -15,11 +16,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Auth routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/boats", boatRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reservations", reservationRoutes);
+
 
   
 
