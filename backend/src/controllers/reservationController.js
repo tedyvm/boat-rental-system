@@ -6,41 +6,18 @@ const Boat = require("../models/Boat");
 const createReservation = asyncHandler(async (req, res) => {
   const { boatId, startDate, endDate, note } = req.body;
 
-  if (!boatId || !startDate || !endDate) {
-    res.status(400);
-    throw new Error("boatId, startDate and endDate are required");
-  }
-
+  // boatId, startDate, endDate jau validuoti middleware
   const boat = await Boat.findById(boatId);
   if (!boat) {
     res.status(404);
     throw new Error("Boat not found");
   }
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  if (start < new Date()) {
-    res.status(400);
-    throw new Error("Cannot reserve in the past");
-  }
-  if (end <= start) {
-    res.status(400);
-    throw new Error("End date must be after start date");
-  }
-
-  // conflict check (pending blocks too)
-  const conflict = await Reservation.hasConflict(boatId, start, end);
-  if (conflict) {
-    res.status(400);
-    throw new Error("Boat is not available for selected dates");
-  }
-
   const reservation = await Reservation.create({
     user: req.user._id,
     boat: boatId,
-    startDate: start,
-    endDate: end,
+    startDate: new Date(startDate),
+    endDate: new Date(endDate),
     note,
     status: "pending",
   });
@@ -68,7 +45,6 @@ const getReservationById = asyncHandler(async (req, res) => {
     throw new Error("Reservation not found");
   }
 
-  // tik savininkas arba admin gali matyti
   if (
     reservation.user._id.toString() !== req.user._id.toString() &&
     req.user.role !== "admin"
@@ -101,19 +77,9 @@ const updateReservation = asyncHandler(async (req, res) => {
     throw new Error("Only pending reservations can be updated");
   }
 
-  const { startDate, endDate } = req.body;
-  if (startDate) reservation.startDate = new Date(startDate);
-  if (endDate) reservation.endDate = new Date(endDate);
-
-  const conflict = await Reservation.hasConflict(
-    reservation.boat,
-    reservation.startDate,
-    reservation.endDate
-  );
-  if (conflict) {
-    res.status(400);
-    throw new Error("Boat is not available for new dates");
-  }
+  // startDate/endDate jau validuoti middleware
+  if (req.body.startDate) reservation.startDate = new Date(req.body.startDate);
+  if (req.body.endDate) reservation.endDate = new Date(req.body.endDate);
 
   await reservation.save();
   res.json(reservation);
@@ -139,7 +105,6 @@ const cancelReservation = asyncHandler(async (req, res) => {
   await reservation.save();
   res.json({ message: "Reservation cancelled" });
 });
-
 
 module.exports = {
   createReservation,

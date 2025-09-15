@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
+const validateReservation = require("../middleware/validateReservation");
 const {
   createReservation,
   getMyReservations,
@@ -9,10 +10,10 @@ const {
   cancelReservation,
 } = require("../controllers/reservationController");
 
-router.post("/", protect, createReservation);  // <-- svarbu
 router.get("/me", protect, getMyReservations);
 router.get("/:id", protect, getReservationById);
-router.put("/:id", protect, updateReservation);
+router.post("/", protect, validateReservation, createReservation);
+router.put("/:id", protect, validateReservation, updateReservation);
 router.delete("/:id", protect, cancelReservation);
 
 module.exports = router;
