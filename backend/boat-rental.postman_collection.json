@@ -1,0 +1,215 @@
+{
+  "info": {
+    "name": "Boat Rental API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Test1234!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/users/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Test1234!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/users/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "users", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Boats",
+      "item": [
+        {
+          "name": "Create Boat (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"katamaranas\",\n  \"name\": \"Lagoon 450\",\n  \"description\": \"Gražus katamaranas šeimos kelionėms\",\n  \"pricePerDay\": 500,\n  \"capacity\": 8,\n  \"withCaptain\": true,\n  \"status\": \"published\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/boats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "boats"]
+            }
+          }
+        },
+        {
+          "name": "Get Published Boats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5000/api/boats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "boats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Create Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"boatId\": \"{{BOAT_ID}}\",\n  \"startDate\": \"2025-09-20\",\n  \"endDate\": \"2025-09-25\",\n  \"note\": \"Šeimos kelionė\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/reservations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "Get My Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/reservations/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "reservations", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Reservation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-09-22\",\n  \"endDate\": \"2025-09-26\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/reservations/{{RESERVATION_ID}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "reservations", "{{RESERVATION_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Reservation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/reservations/{{RESERVATION_ID}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "reservations", "{{RESERVATION_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Reservations",
+      "item": [
+        {
+          "name": "Get All Reservations (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/admin/reservations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "admin", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "Update Reservation Status (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admin/reservations/{{RESERVATION_ID}}/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "admin", "reservations", "{{RESERVATION_ID}}", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "USER_TOKEN", "value": "" },
+    { "key": "ADMIN_TOKEN", "value": "" },
+    { "key": "BOAT_ID", "value": "" },
+    { "key": "RESERVATION_ID", "value": "" }
+  ]
+}

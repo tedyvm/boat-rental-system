@@ -16,7 +16,7 @@ router.delete("/users/:id", protect, admin, deleteUser); // Adminas trina bet ku
 
 // RESERVATIONS
 router.get("/reservations", protect, admin, getAllReservations);
-router.put("/reservations/:id", protect, admin, updateReservationStatus);
+router.put("/reservations/:id/status", protect, admin, updateReservationStatus);
 
 // BOATS
 router.get("/boats", protect, admin, getAllBoatsAdmin);
