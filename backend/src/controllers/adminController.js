@@ -1,38 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Boat = require("../models/Boat");
 const User = require("../models/User");
-
-const createBoat = asyncHandler(async (req, res) => {
-  const {
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status,
-  } = req.body;
-
-  const boatExists = await Boat.findOne({ name });
-  if (boatExists) {
-    res.status(400);
-    throw new Error("Boat already exists");
-  }
-
-  const boat = await Boat.create({
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status: status || "draft",
-  });
-
-  res.status(201).json(boat);
-});
+const Reservation = require("../models/Reservation");
 
 //USERS
 const updateUser = asyncHandler(async (req, res) => {
@@ -69,6 +38,38 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 // BOATS
+const createBoat = asyncHandler(async (req, res) => {
+  const {
+    type,
+    name,
+    description,
+    pricePerDay,
+    capacity,
+    withCaptain,
+    images,
+    status,
+  } = req.body;
+
+  const boatExists = await Boat.findOne({ name });
+  if (boatExists) {
+    res.status(400);
+    throw new Error("Boat already exists");
+  }
+
+  const boat = await Boat.create({
+    type,
+    name,
+    description,
+    pricePerDay,
+    capacity,
+    withCaptain,
+    images,
+    status: status || "draft",
+  });
+
+  res.status(201).json(boat);
+});
+
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
   const boats = await Boat.find({});
   res.json(boats);
@@ -116,6 +117,41 @@ const deleteBoat = asyncHandler(async (req, res) => {
   res.json({ message: "Boat removed successfully" });
 });
 
+// RESERVATIONS
+
+const getAllReservations = asyncHandler(async (req, res) => {
+  const filter = {};
+  if (req.query.status) filter.status = req.query.status;
+  if (req.query.boatId) filter.boat = req.query.boatId;
+  if (req.query.userId) filter.user = req.query.userId;
+
+  const reservations = await Reservation.find(filter)
+    .populate("boat", "name type")
+    .populate("user", "username email")
+    .sort({ startDate: 1 });
+
+  res.json(reservations);
+});
+
+const updateReservationStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const allowed = ["approved", "rejected", "active", "completed", "cancelled"];
+  if (!allowed.includes(status)) {
+    res.status(400);
+    throw new Error("Invalid status");
+  }
+
+  const reservation = await Reservation.findById(req.params.id);
+  if (!reservation) {
+    res.status(404);
+    throw new Error("Reservation not found");
+  }
+
+  reservation.status = status;
+  await reservation.save();
+  res.json(reservation);
+});
+
 module.exports = {
   createBoat,
   getAllBoatsAdmin,
@@ -123,4 +159,6 @@ module.exports = {
   deleteBoat,
   updateUser,
   deleteUser,
+  getAllReservations,
+  updateReservationStatus,
 };

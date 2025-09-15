@@ -7,12 +7,18 @@ const {
   updateBoat,
   deleteBoat,
   updateUser,
-  deleteUser,
+  deleteUser, getAllReservations, updateReservationStatus,
 } = require("../controllers/adminController");
 
+// USERS
 router.put("/users/:id", protect, admin, updateUser); // Adminas redaguoja bet kurį
 router.delete("/users/:id", protect, admin, deleteUser); // Adminas trina bet kurį
 
+// RESERVATIONS
+router.get("/reservations", protect, admin, getAllReservations);
+router.put("/reservations/:id", protect, admin, updateReservationStatus);
+
+// BOATS
 router.get("/boats", protect, admin, getAllBoatsAdmin);
 router.post("/boats", protect, admin, createBoat);
 router.put("/boats/:id", protect, admin, updateBoat);
