@@ -5,7 +5,9 @@ import BoatFilters from "../components/BoatFilters";
 export default function Boats() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    console.log("LOCATION CHANGE:", location.pathname + location.search);
+  }, [location]);
   const [boats, setBoats] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +36,8 @@ export default function Boats() {
 
   const handleFiltersChange = (newFilters) => {
     const params = new URLSearchParams(newFilters).toString();
-    navigate(`/boats?${params}`);
+    window.history.replaceState({}, "", `/boats?${params}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   return (
@@ -42,7 +45,10 @@ export default function Boats() {
       <div className="row">
         {/* Filtrų stulpelis */}
         <aside className="col-md-3">
-          <BoatFilters onChange={handleFiltersChange} initialValues={initialFilters} />
+          <BoatFilters
+            onChange={handleFiltersChange}
+            initialValues={initialFilters}
+          />
         </aside>
 
         {/* Laivų sąrašas */}
@@ -67,7 +73,10 @@ export default function Boats() {
                       {boat.type} • {boat.capacity} vietų
                     </p>
                     <p className="fw-bold">{boat.pricePerDay} €/diena</p>
-                    <a href={`/boats/${boat._id}`} className="btn btn-primary mt-auto">
+                    <a
+                      href={`/boats/${boat._id}`}
+                      className="btn btn-primary mt-auto"
+                    >
                       Peržiūrėti
                     </a>
                   </div>

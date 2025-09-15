@@ -1,0 +1,27 @@
+.container{
+    max-width: 1440px;
+}
+.search-bar {
+  background-color: #0F203A;
+  padding: 1rem 0;
+}
+
+
+.search-bar select,
+.search-bar input {
+  width: 100%;
+}
+
+.date-picker-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.calendar-popup {
+  position: absolute;
+  top: 110%;
+  z-index: 10;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

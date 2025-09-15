@@ -1,84 +1,40 @@
 import { useState } from "react";
 import { DateRange } from "react-date-range";
-import { addDays, differenceInCalendarDays } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import "../styles/Home.css";
+import SearchBar from "../components/SearchBar";
 
 export default function Home() {
-  const navigate = useNavigate();
-  const today = new Date();
-  const minStart = addDays(today, 3);
-
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: minStart,
-      endDate: addDays(minStart, 3),
-      key: "selection",
-    },
-  ]);
-
-  const [type, setType] = useState("");
-
-  const handleDateChange = (item) => {
-    let { startDate, endDate } = item.selection;
-    if (differenceInCalendarDays(endDate, startDate) < 3) {
-      endDate = addDays(startDate, 3);
-    }
-    setDateRange([{ ...item.selection, startDate, endDate }]);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const params = new URLSearchParams();
-    params.append("startDate", dateRange[0].startDate.toISOString());
-    params.append("endDate", dateRange[0].endDate.toISOString());
-    if (type) params.append("type", type);
-
-    navigate(`/boats?${params.toString()}`);
+  const handleSearch = (filters) => {
+    console.log("Filters:", filters);
+    // čia galėsi daryti redirect į /boats su query parametrais
+    // pvz.: navigate(`/boats?${new URLSearchParams(filters)}`);
   };
 
   return (
-    <div className="container py-5">
-      <h1 className="text-center mb-4">Raskite savo laivą</h1>
-      <form className="row g-3 justify-content-center" onSubmit={handleSubmit}>
-        {/* Laivo tipas */}
-        <div className="col-md-4">
-          <label className="form-label">Laivo tipas</label>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="form-select"
-          >
-            <option value="">Visi</option>
-            <option value="katamaranas">Katamaranas</option>
-            <option value="jachta">Jachta</option>
-            <option value="motorinis">Motorinis</option>
-            <option value="valtis">Valtis</option>
-          </select>
+    <div>
+      <div className="container-fluid hero-section">
+        <div className="container hero-container pb-5">
+          <div className="row">
+            <div className="col-lg-6 col-12 text-white text-start text-md-center ">
+              <h1 className="hero-title">Sailing adventure starts here...</h1>
+              <p className="hero-subtitle mt-3">
+                Find the best boats at the best prices – start your journey
+                today!
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Datos pasirinkimas */}
-        <div className="col-md-8">
-          <label className="form-label d-block">Pasirinkite datas</label>
-          <DateRange
-            editableDateInputs={true}
-            onChange={handleDateChange}
-            moveRangeOnFirstSelection={false}
-            ranges={dateRange}
-            minDate={minStart}
-            rangeColors={["#0d6efd"]}
-            dateDisplayFormat="yyyy-MM-dd"
-          />
+      {/* Search Bar */}
+      <div className="container-fluid search-bar">
+        <div className="container">
+          <SearchBar onSearch={handleSearch} />
         </div>
-
-        <div className="col-12 text-center mt-3">
-          <button type="submit" className="btn btn-primary px-5">
-            Ieškoti
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }
