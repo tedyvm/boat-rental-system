@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { DateRange } from "react-date-range";
 import { addDays, differenceInCalendarDays } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function Home() {
+  const navigate = useNavigate();
   const today = new Date();
   const minStart = addDays(today, 3);
 
@@ -20,31 +22,21 @@ export default function Home() {
 
   const handleDateChange = (item) => {
     let { startDate, endDate } = item.selection;
-
-    // Jei intervalas per trumpas, automatiškai pailginam iki 3 d.
     if (differenceInCalendarDays(endDate, startDate) < 3) {
       endDate = addDays(startDate, 3);
     }
-
-    setDateRange([
-      {
-        ...item.selection,
-        startDate,
-        endDate,
-      },
-    ]);
+    setDateRange([{ ...item.selection, startDate, endDate }]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("Paieškos kriterijai:", {
-      type,
-      startDate: dateRange[0].startDate.toISOString(),
-      endDate: dateRange[0].endDate.toISOString(),
-    });
+    const params = new URLSearchParams();
+    params.append("startDate", dateRange[0].startDate.toISOString());
+    params.append("endDate", dateRange[0].endDate.toISOString());
+    if (type) params.append("type", type);
 
-    // čia vėliau kviesim GET /api/boats/search su filtrais
+    navigate(`/boats?${params.toString()}`);
   };
 
   return (
