@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Boats from "./pages/Boats";
+import BoatDetails from "./pages/BoatDetails";
 import { AuthProvider } from "./context/AuthContext";
 
 const router = createBrowserRouter([
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/boats", element: <Boats /> },
+      { path: "/boats/:id", element: <BoatDetails /> },
     ],
   },
 ]);

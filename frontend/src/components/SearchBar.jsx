@@ -6,6 +6,7 @@ import {
   format,
   isBefore,
   isAfter,
+  parseISO,
 } from "date-fns";
 import { useLocation, useNavigate } from "react-router-dom";
 import "react-date-range/dist/styles.css";
@@ -22,10 +23,10 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
   const typeFromUrl = searchParams.get("type") || "";
   const withCaptainFromUrl = searchParams.get("withCaptain") === "true";
   const startFromUrl = searchParams.get("startDate")
-    ? new Date(searchParams.get("startDate"))
+    ? parseISO(searchParams.get("startDate") + "T00:00:00")
     : null;
   const endFromUrl = searchParams.get("endDate")
-    ? new Date(searchParams.get("endDate"))
+    ? parseISO(searchParams.get("endDate") + "T00:00:00")
     : null;
 
   const [type, setType] = useState(typeFromUrl);
@@ -37,7 +38,10 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
   const [selectingStart, setSelectingStart] = useState(false);
   const [dateInputValue, setDateInputValue] = useState(
     startFromUrl && endFromUrl
-      ? `${format(startFromUrl, "yyyy-MM-dd")} → ${format(endFromUrl, "yyyy-MM-dd")}`
+      ? `${format(startFromUrl, "yyyy-MM-dd")} → ${format(
+          endFromUrl,
+          "yyyy-MM-dd"
+        )}`
       : "When do you want to start?"
   );
   const [monthsToShow, setMonthsToShow] = useState(1);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { DateRange } from "react-date-range";
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays, format } from "date-fns";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import "react-date-range/dist/styles.css";
@@ -52,7 +52,8 @@ export default function BoatFilters({
     setFilters((prev) => ({
       ...prev,
       priceMax: prev.priceMax > maxPrice ? maxPrice : prev.priceMax,
-      capacityMin: prev.capacityMin > maxCapacity ? maxCapacity : prev.capacityMin,
+      capacityMin:
+        prev.capacityMin > maxCapacity ? maxCapacity : prev.capacityMin,
     }));
   }, [maxPrice, maxCapacity]);
 
@@ -61,8 +62,10 @@ export default function BoatFilters({
     const cleaned = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v !== "" && v != null)
     );
-    if (cleaned.startDate) cleaned.startDate = cleaned.startDate.toISOString();
-    if (cleaned.endDate) cleaned.endDate = cleaned.endDate.toISOString();
+    if (cleaned.startDate)
+      cleaned.startDate = format(cleaned.startDate, "yyyy-MM-dd");
+    if (cleaned.endDate)
+      cleaned.endDate = format(cleaned.endDate, "yyyy-MM-dd");
     onChange(cleaned);
   }, [filters]);
 
@@ -176,10 +179,10 @@ export default function BoatFilters({
               priceMax: vals[1],
             }))
           }
-          trackStyle={[{ backgroundColor: "#0d6efd" }]}
+          trackStyle={[{ backgroundColor: "#45CAD1" }]}
           handleStyle={[
-            { borderColor: "#0d6efd", backgroundColor: "#0d6efd" },
-            { borderColor: "#0d6efd", backgroundColor: "#0d6efd" },
+            { borderColor: "#45CAD1", backgroundColor: "#45CAD1" },
+            { borderColor: "#45CAD1", backgroundColor: "#45CAD1" },
           ]}
         />
       </div>
@@ -213,8 +216,8 @@ export default function BoatFilters({
           onChange={(val) =>
             setFilters((prev) => ({ ...prev, capacityMin: val }))
           }
-          trackStyle={[{ backgroundColor: "#0d6efd" }]}
-          handleStyle={[{ borderColor: "#0d6efd", backgroundColor: "#0d6efd" }]}
+          trackStyle={[{ backgroundColor: "#45CAD1" }]}
+          handleStyle={[{ borderColor: "#45CAD1", backgroundColor: "#45CAD1" }]}
         />
       </div>
     </div>
