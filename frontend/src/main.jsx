@@ -1,28 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
+import Layout from "./layout/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Boats from "./pages/Boats";
 import { AuthProvider } from "./context/AuthContext";
 
-const Layout = () => (
-  <>
-    <Navbar />
-    <Outlet />
-  </>
-);
-
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <Layout />, // NAUJAS layout
     children: [
       { path: "/", element: <Home /> },
       { path: "/login", element: <Login /> },

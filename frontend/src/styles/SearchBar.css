@@ -1,0 +1,35 @@
+.container {
+  max-width: 1440px;
+}
+.search-bar {
+  background-color: #0f203a;
+  padding: 1rem 0;
+}
+
+.search-bar select,
+.search-bar input {
+  width: 100%;
+}
+
+.date-picker-wrapper {
+  position: relative;
+}
+
+.calendar-popup {
+  position: absolute;
+  bottom: 100%; /* ✅ iškelia virš input */
+  left: 50%; /* per vidurį tėvo */
+  transform: translateX(-50%); /* paslenka per pusę savo pločio į kairę */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  overflow: hidden;
+}
+
+.input-group .form-control:focus, .input-group .form-select:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #ced4da; /* grąžinam default border spalvą */
+}

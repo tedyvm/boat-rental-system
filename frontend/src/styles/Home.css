@@ -1,0 +1,137 @@
+.hero-section {
+  background-image: url("/images/hero.png");
+  background-size: cover;
+  background-position: center;
+  min-height: 462px; /* arba 100vh jei nori viso ekrano */
+  display: flex;
+  align-items: flex-end; /* 👈 stumia turinį į apačią */
+}
+
+.hero-container {
+  max-width: 1440px;
+  height: 100%;
+}
+
+.hero-title {
+  font-family: Montserrat;
+  font-weight: 400;
+  font-style: Italic;
+  font-size: 40px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.hero-subtitle {
+  font-family: Montserrat;
+  font-weight: 200;
+  font-style: Italic;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+h2 {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 24px;
+  line-height: 100%;
+}
+
+p {
+  font-family: Inter;
+  font-weight: 300;
+  font-style: Light;
+  font-size: 16px;
+  line-height: 100%;
+  vertical-align: middle;
+}
+
+.s1c1 {
+  background-image: url("/images/s1c1.png");
+  background-size: cover;
+  background-position: center;
+  height: 335px;
+}
+
+/* S1 */
+
+.s1c2 {
+  background-image: url("/images/s1c2_bg.png");
+  background-size: cover;
+  background-position: center;
+  height: 335px;
+}
+
+.s1c1 h3,
+.s1c2 h3 {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 32px;
+  vertical-align: middle;
+  color: white;
+}
+
+.s1c1 p,
+.s1c2 p {
+  font-family: Inter;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 16px;
+  color: white;
+}
+
+/* S2 */
+.s2-content h4 {
+  font-family: Inter;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 20px;
+  line-height: 22px;
+}
+.s2-content p {
+  font-family: Inter;
+  font-weight: 300;
+  font-style: Light;
+  font-size: 16px;
+  line-height: 17.6px;
+}
+
+/* S3 */
+.s3 {
+  background-image: url("/images/s3-bg.png");
+  background-size: cover;
+  background-position: center;
+  height: 312px;
+  color: white;
+}
+.s3 h2 {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 24px;
+  padding-top: 100px;
+}
+.s3 p {
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+  margin-top: 36px;
+  margin-bottom: 19px;
+}
+
+.s3 button {
+  color: white;
+  background-color: #45CAD1;
+  border: none;
+  border-radius: 99px;
+  color: white;
+  font-family: Inter;
+  font-style: medium;
+  font-size: 20px;
+  cursor: pointer;
+  width: 240px;
+  height: 44px;
+}
