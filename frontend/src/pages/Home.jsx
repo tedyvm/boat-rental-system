@@ -37,7 +37,7 @@ export default function Home() {
       </div>
 
       {/* Additional Content */}
-      <div className="container p-5">
+      <div className="container pt-5">
         <h2 className="">What type of boat you’re looking for? </h2>
         <p>Wide choice online for the best prices</p>
         {/* S1 */}
@@ -135,6 +135,14 @@ export default function Home() {
               <p>Free cancellation and low prepayment</p>
             </div>
           </div>
+        </div>
+      </div>
+      {/* Section 3 */}
+      <div className="container-fluid s3">
+        <div className="container">
+          <h2>Are you a yacht owner?</h2>
+          <p>List your boat on SailGO and earn money.</p>
+          <button>Join Us</button>
         </div>
       </div>
     </div>

@@ -97,3 +97,41 @@ p {
   font-size: 16px;
   line-height: 17.6px;
 }
+
+/* S3 */
+.s3 {
+  background-image: url("/images/s3-bg.png");
+  background-size: cover;
+  background-position: center;
+  height: 312px;
+  color: white;
+}
+.s3 h2 {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 24px;
+  padding-top: 100px;
+}
+.s3 p {
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+  margin-top: 36px;
+  margin-bottom: 19px;
+}
+
+.s3 button {
+  color: white;
+  background-color: #45CAD1;
+  border: none;
+  border-radius: 99px;
+  color: white;
+  font-family: Inter;
+  font-style: medium;
+  font-size: 20px;
+  cursor: pointer;
+  width: 240px;
+  height: 44px;
+}
