@@ -1,0 +1,46 @@
+.boats-s1 {
+  height: 150px;
+  background: url("/images/boats-header.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 45%; /* perkelia 20% žemyn */
+}
+
+.boats-filter-button-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  background: #0f203a;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.boats-offcanvas{
+    z-index: 1060;
+}
+
+.button {
+  color: white;
+  background-color: #45cad1;
+  border: none;
+  border-radius: 99px;
+  color: white;
+  font-family: Inter;
+  font-style: medium;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  height: 50px;
+}
+.button:hover {
+  background-color: #34b3b8;
+  color: white;
+  text-decoration: none;
+}
+.button:active {
+  background-color: #2a8c8f;
+  color: white;
+  text-decoration: none;
+}
+
+
+

@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { DateRange } from "react-date-range";
 import { addDays, differenceInCalendarDays } from "date-fns";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-export default function BoatFilters({ onChange, initialValues = {} }) {
+export default function BoatFilters({
+  onChange,
+  initialValues = {},
+  maxPrice = 2000,
+  maxCapacity = 20,
+}) {
   const today = new Date();
   const minStart = addDays(today, 3);
   const calendarRef = useRef(null);
@@ -13,10 +20,10 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
 
   const [filters, setFilters] = useState({
     type: initialValues.type || "",
-    priceMin: initialValues.priceMin || "",
-    priceMax: initialValues.priceMax || "",
+    priceMin: Number(initialValues.priceMin) || 0,
+    priceMax: Number(initialValues.priceMax) || maxPrice,
     withCaptain: initialValues.withCaptain || "",
-    capacityMin: initialValues.capacityMin || "",
+    capacityMin: Number(initialValues.capacityMin) || 0,
     startDate: initialValues.startDate
       ? new Date(initialValues.startDate)
       : minStart,
@@ -40,6 +47,16 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
     };
   }, [showCalendar]);
 
+  // kai pasikeičia maxPrice/maxCapacity (pvz. filtruotas sąrašas sumažėjo)
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      priceMax: prev.priceMax > maxPrice ? maxPrice : prev.priceMax,
+      capacityMin: prev.capacityMin > maxCapacity ? maxCapacity : prev.capacityMin,
+    }));
+  }, [maxPrice, maxCapacity]);
+
+  // pranešame tėviniam komponentui apie pokyčius
   useEffect(() => {
     const cleaned = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v !== "" && v != null)
@@ -67,8 +84,8 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
     <div className="p-3 border rounded bg-light">
       <h5 className="mb-3">Filtrai</h5>
 
-      {/* Datos pasirinkimas su popup */}
-      <div className="mb-3 position-relative">
+      {/* Datos pasirinkimas */}
+      <div className="mb-3 position-relative d-block d-md-none">
         <label className="form-label">Datos intervalas</label>
         <div className="d-flex gap-2">
           <input
@@ -121,7 +138,7 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
       </div>
 
       {/* Tipas */}
-      <div className="mb-3">
+      <div className="mb-3 d-block d-md-none">
         <label className="form-label">Laivo tipas</label>
         <select
           value={filters.type}
@@ -138,34 +155,37 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
         </select>
       </div>
 
-      {/* Kaina nuo */}
+      {/* Kainų diapazonas (slider) */}
       <div className="mb-3">
-        <label className="form-label">Kaina nuo</label>
-        <input
-          type="number"
-          value={filters.priceMin}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, priceMin: e.target.value }))
+        <label className="form-label d-flex justify-content-between">
+          <span>Kaina (€)</span>
+          <span>
+            {filters.priceMin} – {filters.priceMax}
+          </span>
+        </label>
+        <Slider
+          range
+          min={0}
+          max={maxPrice}
+          step={10}
+          value={[filters.priceMin, filters.priceMax]}
+          onChange={(vals) =>
+            setFilters((prev) => ({
+              ...prev,
+              priceMin: vals[0],
+              priceMax: vals[1],
+            }))
           }
-          className="form-control"
-        />
-      </div>
-
-      {/* Kaina iki */}
-      <div className="mb-3">
-        <label className="form-label">Kaina iki</label>
-        <input
-          type="number"
-          value={filters.priceMax}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, priceMax: e.target.value }))
-          }
-          className="form-control"
+          trackStyle={[{ backgroundColor: "#0d6efd" }]}
+          handleStyle={[
+            { borderColor: "#0d6efd", backgroundColor: "#0d6efd" },
+            { borderColor: "#0d6efd", backgroundColor: "#0d6efd" },
+          ]}
         />
       </div>
 
       {/* Kapitonas */}
-      <div className="form-check mb-3">
+      <div className="form-check mb-3 d-block d-md-none">
         <input
           className="form-check-input"
           type="checkbox"
@@ -180,16 +200,21 @@ export default function BoatFilters({ onChange, initialValues = {} }) {
         <label className="form-check-label">Tik su kapitonu</label>
       </div>
 
-      {/* Min. vietų */}
+      {/* Min. vietų (slider) */}
       <div className="mb-3">
-        <label className="form-label">Min. vietų</label>
-        <input
-          type="number"
+        <label className="form-label d-flex justify-content-between">
+          <span>Vietos</span>
+          <span>{filters.capacityMin}+</span>
+        </label>
+        <Slider
+          min={0}
+          max={maxCapacity}
           value={filters.capacityMin}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, capacityMin: e.target.value }))
+          onChange={(val) =>
+            setFilters((prev) => ({ ...prev, capacityMin: val }))
           }
-          className="form-control"
+          trackStyle={[{ backgroundColor: "#0d6efd" }]}
+          handleStyle={[{ borderColor: "#0d6efd", backgroundColor: "#0d6efd" }]}
         />
       </div>
     </div>
