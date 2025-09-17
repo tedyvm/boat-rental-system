@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function Layout() {
   return (
@@ -8,9 +9,7 @@ export default function Layout() {
       <main className="flex-grow-1">
         <Outlet />
       </main>
-      <footer className="bg-dark text-white text-center py-3 mt-5">
-        <p className="mb-0">&copy; 2025 SailGo. All rights reserved.</p>
-      </footer>
+      <Footer />
     </>
   );
 }
