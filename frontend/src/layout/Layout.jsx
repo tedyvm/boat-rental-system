@@ -9,7 +9,6 @@ export default function Layout() {
       <main className="flex-grow-1">
         <Outlet />
       </main>
-      <Footer />
     </>
   );
 }

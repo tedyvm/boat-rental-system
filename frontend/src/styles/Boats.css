@@ -1,3 +1,4 @@
+
 .boats-s1 {
   height: 150px;
   background: url("/images/boats-header.jpg");
@@ -14,8 +15,8 @@
   padding: 0.5rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-.boats-offcanvas{
-    z-index: 1060;
+.boats-offcanvas {
+  z-index: 1060;
 }
 
 .button {
@@ -41,6 +42,36 @@
   color: white;
   text-decoration: none;
 }
+.boats-list p {
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+}
 
+.sort-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 5px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  min-width: 180px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
 
+.sort-dropdown .dropdown-item {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
 
+.sort-dropdown .dropdown-item:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
