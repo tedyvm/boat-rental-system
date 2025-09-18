@@ -1,75 +1,64 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import AdminBoatFilters from "../../components/admin/AdminBoatFilters";
 
 export default function AdminBoatList() {
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [boats, setBoats] = useState([]);
-  const [filteredBoats, setFilteredBoats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [sort, setSort] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    const fetchBoats = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch("http://localhost:5000/api/admin/boats", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch boats");
-        const data = await res.json();
-        setBoats(data);
-        setFilteredBoats(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBoats();
-  }, [token]);
+  }, [token, currentPage, searchTerm, selectedType, selectedStatus, sort]);
+
+  async function fetchBoats() {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      params.set("page", currentPage);
+      params.set("limit", 10);
+      if (searchTerm) params.set("search", searchTerm);
+      if (selectedType) params.set("type", selectedType);
+      if (selectedStatus) params.set("status", selectedStatus);
+      if (sort) params.set("sort", sort);
+
+      const res = await fetch(
+        `http://localhost:5000/api/admin/boats?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      setBoats(data.boats);
+      setTotalPages(data.pages);
+    } catch (err) {
+      console.error("Failed to fetch boats", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleFilter = ({ status, type, search }) => {
-    let filtered = [...boats];
-
-    if (status !== "all") {
-      filtered = filtered.filter((b) => b.status === status);
-    }
-
-    if (type !== "all") {
-      filtered = filtered.filter((b) => b.type === type);
-    }
-
-    if (search.trim() !== "") {
-      filtered = filtered.filter((b) =>
-        b.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    setFilteredBoats(filtered);
+    setCurrentPage(1); // kai keiti filtrus, grįžti į 1 puslapį
+    setSelectedStatus(status !== "all" ? status : "");
+    setSelectedType(type !== "all" ? type : "");
+    setSearchTerm(search);
   };
 
   const handleSort = (field) => {
-    let direction = sortDirection;
-    if (sortField === field) {
-      direction = sortDirection === "asc" ? "desc" : "asc";
-    } else {
-      direction = "asc";
-    }
-    setSortField(field);
-    setSortDirection(direction);
-
-    setFilteredBoats((prev) =>
-      [...prev].sort((a, b) => {
-        const valueA = a[field];
-        const valueB = b[field];
-        if (valueA < valueB) return direction === "asc" ? -1 : 1;
-        if (valueA > valueB) return direction === "asc" ? 1 : -1;
-        return 0;
-      })
-    );
+    let newSort = "";
+    if (sort === `${field}-asc`) newSort = `${field}-desc`;
+    else newSort = `${field}-asc`;
+    setSort(newSort);
   };
 
   if (loading) return <p>Loading boats...</p>;
@@ -78,7 +67,7 @@ export default function AdminBoatList() {
     <div className="container">
       <h2 className="my-3">Admin Boat List</h2>
       <AdminBoatFilters onFilter={handleFilter} />
-      
+
       <table className="table table-striped table-hover">
         <thead>
           <tr>
@@ -90,22 +79,22 @@ export default function AdminBoatList() {
               onClick={() => handleSort("pricePerDay")}
             >
               Price/Day{" "}
-              {sortField === "pricePerDay" &&
-                (sortDirection === "asc" ? "↑" : "↓")}
+              {sort.startsWith("pricePerDay") &&
+                (sort.endsWith("asc") ? "↑" : "↓")}
             </th>
             <th
               style={{ cursor: "pointer" }}
               onClick={() => handleSort("capacity")}
             >
               Capacity{" "}
-              {sortField === "capacity" &&
-                (sortDirection === "asc" ? "↑" : "↓")}
+              {sort.startsWith("capacity") &&
+                (sort.endsWith("asc") ? "↑" : "↓")}
             </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredBoats.map((boat) => (
+          {boats.map((boat) => (
             <tr key={boat._id}>
               <td>{boat.name}</td>
               <td>{boat.type}</td>
@@ -126,13 +115,10 @@ export default function AdminBoatList() {
               <td>
                 <button
                   className="btn btn-sm btn-primary me-2"
-                  onClick={() =>
-                    (window.location.href = `/admin/boats/${boat._id}`)
-                  }
+                  onClick={() => navigate(`/admin/boats/${boat._id}`)}
                 >
                   Edit
                 </button>
-
                 <button
                   className="btn btn-sm btn-danger"
                   onClick={() => handleDelete(boat._id)}
@@ -144,12 +130,57 @@ export default function AdminBoatList() {
           ))}
         </tbody>
       </table>
+
       <button
         className="btn btn-success mb-3"
         onClick={() => navigate("/admin/boats/new")}
       >
         + Add New Boat
       </button>
+
+      {totalPages > 1 && (
+        <nav className="mt-3">
+          <ul className="pagination">
+            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+              <button
+                className="page-link"
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              >
+                &laquo;
+              </button>
+            </li>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <li
+                key={i}
+                className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+
+            <li
+              className={`page-item ${
+                currentPage === totalPages ? "disabled" : ""
+              }`}
+            >
+              <button
+                className="page-link"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+              >
+                &raquo;
+              </button>
+            </li>
+          </ul>
+        </nav>
+      )}
     </div>
   );
 
@@ -168,9 +199,6 @@ export default function AdminBoatList() {
       setBoats((prev) =>
         prev.map((b) => (b._id === boat._id ? { ...b, status: newStatus } : b))
       );
-      setFilteredBoats((prev) =>
-        prev.map((b) => (b._id === boat._id ? { ...b, status: newStatus } : b))
-      );
     } catch (error) {
       console.error("Failed to toggle status", error);
     }
@@ -184,7 +212,6 @@ export default function AdminBoatList() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBoats((prev) => prev.filter((b) => b._id !== id));
-      setFilteredBoats((prev) => prev.filter((b) => b._id !== id));
     } catch (error) {
       console.error("Failed to delete boat", error);
     }

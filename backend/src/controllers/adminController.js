@@ -71,8 +71,36 @@ const createBoat = asyncHandler(async (req, res) => {
 });
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
-  const boats = await Boat.find({});
-  res.json(boats);
+  const { search, type, status, sort, page = 1, limit = 10 } = req.query;
+
+  const filter = {};
+
+  if (search) {
+    filter.name = { $regex: search, $options: "i" }; // paieška pagal pavadinimą
+  }
+  if (type) filter.type = type;
+  if (status) filter.status = status;
+
+  let sortOption = {};
+  if (sort === "price-asc") sortOption = { pricePerDay: 1 };
+  if (sort === "price-desc") sortOption = { pricePerDay: -1 };
+  if (sort === "capacity-asc") sortOption = { capacity: 1 };
+  if (sort === "capacity-desc") sortOption = { capacity: -1 };
+  if (!sort) sortOption = { createdAt: -1 }; // naujausi viršuje
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const [boats, total] = await Promise.all([
+    Boat.find(filter).sort(sortOption).skip(skip).limit(Number(limit)),
+    Boat.countDocuments(filter),
+  ]);
+
+  res.json({
+    boats,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / Number(limit)),
+  });
 });
 
 const updateBoat = asyncHandler(async (req, res) => {
