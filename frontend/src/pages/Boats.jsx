@@ -1,27 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BoatFilters from "../components/BoatFilters";
+import SearchBar from "../components/SearchBar";
+import BoatList from "../components/BoatList";
+import { AuthContext } from "../context/AuthContext";
+import "../styles/Boats.css";
+import Button from "react-bootstrap/Button";
+import Offcanvas from "react-bootstrap/Offcanvas";
 
-export default function Boats() {
+export default function Boats({ isAdminView = false }) {
   const location = useLocation();
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log("LOCATION CHANGE:", location.pathname + location.search);
-  }, [location]);
+  const { token } = useContext(AuthContext);
+
   const [boats, setBoats] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   const searchParams = new URLSearchParams(location.search);
-  const initialFilters = Object.fromEntries(searchParams.entries());
+  const currentSort = searchParams.get("sort");
+
+  const handleFiltersChange = (filters) => {
+    const params = new URLSearchParams(filters);
+    if (currentSort) params.set("sort", currentSort);
+    navigate(`/boats?${params.toString()}`);
+  };
+
+  const handleSortChange = (sortOption) => {
+    const params = new URLSearchParams(location.search);
+    if (sortOption) params.set("sort", sortOption);
+    else params.delete("sort");
+    navigate(`/boats?${params.toString()}`);
+  };
 
   useEffect(() => {
     const fetchBoats = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `http://localhost:5000/api/boats/search${location.search}`
-        );
-        if (!res.ok) throw new Error("Nepavyko gauti laivų sąrašo");
+
+        const baseUrl = isAdminView
+          ? "http://localhost:5000/api/admin/boats"
+          : "http://localhost:5000/api/boats/search";
+
+        const url = `${baseUrl}${location.search}`;
+
+        const res = await fetch(url, {
+          headers: isAdminView
+            ? { Authorization: `Bearer ${token}` }
+            : {},
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch boats");
+
         const data = await res.json();
         setBoats(data);
       } catch (err) {
@@ -32,59 +65,64 @@ export default function Boats() {
     };
 
     fetchBoats();
-  }, [location.search]);
-
-  const handleFiltersChange = (newFilters) => {
-    const params = new URLSearchParams(newFilters).toString();
-    window.history.replaceState({}, "", `/boats?${params}`);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  };
+  }, [location.search, isAdminView, token]);
 
   return (
-    <div className="container py-4">
-      <div className="row">
-        {/* Filtrų stulpelis */}
-        <aside className="col-md-3">
-          <BoatFilters
-            onChange={handleFiltersChange}
-            initialValues={initialFilters}
-          />
-        </aside>
+    <div className="boats-page">
+      <div className="container-fluid boats-s1"></div>
 
-        {/* Laivų sąrašas */}
-        <section className="col-md-9">
-          {loading && <p>Kraunama...</p>}
-          {!loading && boats.length === 0 && <p>Laivų nerasta.</p>}
-          <div className="row">
-            {boats.map((boat) => (
-              <div key={boat._id} className="col-md-6 col-lg-4 mb-4">
-                <div className="card h-100 shadow-sm">
-                  {boat.images?.[0] && (
-                    <img
-                      src={boat.images[0]}
-                      className="card-img-top"
-                      alt={boat.name}
-                      style={{ height: "200px", objectFit: "cover" }}
-                    />
-                  )}
-                  <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">{boat.name}</h5>
-                    <p className="card-text">
-                      {boat.type} • {boat.capacity} vietų
-                    </p>
-                    <p className="fw-bold">{boat.pricePerDay} €/diena</p>
-                    <a
-                      href={`/boats/${boat._id}`}
-                      className="btn btn-primary mt-auto"
-                    >
-                      Peržiūrėti
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* Mobilus mygtukas */}
+      <div className="boats-filter-button-wrapper d-block d-md-none text-end px-3">
+        <Button variant="primary" onClick={handleShow} className="button">
+          Filters
+        </Button>
+
+        <Offcanvas show={show} onHide={handleClose} placement="end" className="boats-offcanvas">
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>Filters</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            <BoatFilters
+              onChange={handleFiltersChange}
+              initialValues={Object.fromEntries(
+                new URLSearchParams(location.search).entries()
+              )}
+            />
+          </Offcanvas.Body>
+        </Offcanvas>
+      </div>
+
+      {/* SearchBar */}
+      <div className="container-fluid search-bar d-none d-md-block">
+        <div className="container">
+          <SearchBar showButton={false} onFiltersChange={handleFiltersChange} />
+        </div>
+      </div>
+
+      <div className="container mt-4">
+        <div className="row">
+          <aside className="col-md-3 d-none d-md-block">
+            <BoatFilters
+              onChange={handleFiltersChange}
+              initialValues={Object.fromEntries(
+                new URLSearchParams(location.search).entries()
+              )}
+            />
+          </aside>
+
+          <section className="col-md-9">
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <BoatList
+                boats={boats}
+                isAdminView={isAdminView}
+                currentSort={currentSort}
+                onSortChange={handleSortChange}
+              />
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

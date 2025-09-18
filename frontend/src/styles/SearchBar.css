@@ -17,15 +17,23 @@
 
 .calendar-popup {
   position: absolute;
-  bottom: 100%; /* ✅ iškelia virš input */
   left: 50%; /* per vidurį tėvo */
   transform: translateX(-50%); /* paslenka per pusę savo pločio į kairę */
   background: white;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 28px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 999;
   overflow: hidden;
+}
+/* Home page – išlenda į viršų */
+.calendar-popup.popup-top {
+  bottom: 100%;
+}
+
+/* Boats page – išlenda į apačią */
+.calendar-popup.popup-bottom {
+  top: 100%;
 }
 
 .input-group .form-control:focus, .input-group .form-select:focus {

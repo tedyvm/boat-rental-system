@@ -21,8 +21,22 @@ export default function Login() {
         "http://localhost:5000/api/auth/login",
         data
       );
-      login(res.data);
-      navigate("/");
+
+      // Suformuojame user objektą pagal tavo backend atsakymą
+      login({
+        token: res.data.token,
+        user: {
+          id: res.data._id,        // naudojame _id iš response
+          name: res.data.username, // username kaip vardą
+          email: res.data.email,
+          role: res.data.role,
+        },
+      });
+if (res.data.role === "admin") {
+        navigate("/admin/boats"); // jei admin, nukreipiam į admin panelę
+      } else {
+        navigate("/"); // po prisijungimo nukreipiam į pagrindinį puslapį
+      }
     } catch (err) {
       setServerError(err.response?.data?.message || "Prisijungimas nepavyko");
     }
@@ -67,6 +81,7 @@ export default function Login() {
             Prisijungti
           </button>
         </form>
+
         <div className="text-center mt-3">
           <a href="/register">Neturi paskyros? Registruokis</a>
         </div>

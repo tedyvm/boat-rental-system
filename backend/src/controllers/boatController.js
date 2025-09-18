@@ -28,9 +28,10 @@ const searchBoats = asyncHandler(async (req, res) => {
     capacityMax,
     withCaptain,
     ratingMin,
+    sort,
   } = req.query;
 
-  let filter = {};
+  let filter = {status: "published"};
 
   if (type) filter.type = type;
   if (priceMin || priceMax) filter.pricePerDay = {};
@@ -42,9 +43,16 @@ const searchBoats = asyncHandler(async (req, res) => {
   if (withCaptain !== undefined) filter.withCaptain = withCaptain === "true";
   if (ratingMin) filter.rating = { $gte: Number(ratingMin) };
 
-  let boats = await Boat.find(filter);
+  // Paruošiam sort objektą pagal URL query
+  let sortOption = {};
+  if (sort === "price-asc") sortOption = { pricePerDay: 1 };
+  if (sort === "price-desc") sortOption = { pricePerDay: -1 };
+  if (sort === "capacity") sortOption = { capacity: -1 };
 
-  // Tikriname laisvumas pagal startDate / endDate
+  // Filtruojam ir rūšiuojam
+  let boats = await Boat.find(filter).sort(sortOption);
+
+  // Tikrinam rezervacijų konfliktus (laisvumą)
   if (startDate && endDate) {
     const sDate = new Date(startDate);
     const eDate = new Date(endDate);
@@ -53,7 +61,9 @@ const searchBoats = asyncHandler(async (req, res) => {
       boats.map(async (boat) => {
         const conflict = await Reservation.findOne({
           boat: boat._id,
-          $or: [{ startDate: { $lte: eDate }, endDate: { $gte: sDate } }],
+          $or: [
+            { startDate: { $lte: eDate }, endDate: { $gte: sDate } }, // uždengia intervalą
+          ],
         });
         return conflict ? null : boat;
       })
@@ -64,9 +74,30 @@ const searchBoats = asyncHandler(async (req, res) => {
 
   res.json(boats);
 });
+const getBookedDates = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Patikrinam ar laivas egzistuoja
+  const boat = await Boat.findById(id);
+  if (!boat) {
+    return res.status(404).json({ message: "Boat not found" });
+  }
+
+  // Ištraukiam visas rezervacijas šiam laivui
+  const reservations = await Reservation.find({ boat: id });
+
+  // Grąžinam tik datas (start + end)
+  const bookedDates = reservations.map((r) => ({
+    startDate: r.startDate,
+    endDate: r.endDate,
+  }));
+
+  res.json(bookedDates);
+});
 
 module.exports = {
   getBoats,
   getBoatById,
   searchBoats,
+  getBookedDates,
 };

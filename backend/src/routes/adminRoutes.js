@@ -8,6 +8,7 @@ const {
   deleteBoat,
   updateUser,
   deleteUser, getAllReservations, updateReservationStatus,
+  getBoatByIdAdmin,
 } = require("../controllers/adminController");
 
 // USERS
@@ -20,6 +21,7 @@ router.put("/reservations/:id/status", protect, admin, updateReservationStatus);
 
 // BOATS
 router.get("/boats", protect, admin, getAllBoatsAdmin);
+router.get("/boats/:id", protect, admin, getBoatByIdAdmin);
 router.post("/boats", protect, admin, createBoat);
 router.put("/boats/:id", protect, admin, updateBoat);
 router.delete("/boats/:id", protect, admin, deleteBoat);
