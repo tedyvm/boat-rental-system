@@ -113,7 +113,8 @@ const deleteBoat = asyncHandler(async (req, res) => {
     throw new Error("Boat not found");
   }
 
-  await boat.remove();
+  await Boat.findByIdAndDelete(req.params.id);
+
   res.json({ message: "Boat removed successfully" });
 });
 
@@ -151,6 +152,14 @@ const updateReservationStatus = asyncHandler(async (req, res) => {
   await reservation.save();
   res.json(reservation);
 });
+const getBoatByIdAdmin = asyncHandler(async (req, res) => {
+  const boat = await Boat.findById(req.params.id);
+  if (!boat) {
+    res.status(404);
+    throw new Error("Boat not found");
+  }
+  res.json(boat);
+});
 
 module.exports = {
   createBoat,
@@ -161,4 +170,5 @@ module.exports = {
   deleteUser,
   getAllReservations,
   updateReservationStatus,
+  getBoatByIdAdmin,
 };

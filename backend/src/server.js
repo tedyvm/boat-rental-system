@@ -9,14 +9,14 @@ const reservationRoutes = require("./routes/reservationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const { protect, admin } = require("./middleware/authMiddleware");
 
-
 require("dotenv").config();
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "3mb" }));
+app.use(express.urlencoded({ limit: "3mb", extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -25,11 +25,6 @@ app.use("/api/boats", boatRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/reviews", reviewRoutes);
-
-
-  
-
-
 
 // Connect to MongoDB and start server
 mongoose

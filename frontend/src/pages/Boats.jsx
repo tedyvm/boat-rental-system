@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BoatFilters from "../components/BoatFilters";
 import SearchBar from "../components/SearchBar";
 import BoatList from "../components/BoatList";
+import { AuthContext } from "../context/AuthContext";
 import "../styles/Boats.css";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 
-export default function Boats() {
+export default function Boats({ isAdminView = false }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+
   const [boats, setBoats] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,10 +40,21 @@ export default function Boats() {
     const fetchBoats = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `http://localhost:5000/api/boats/search${location.search}`
-        );
+
+        const baseUrl = isAdminView
+          ? "http://localhost:5000/api/admin/boats"
+          : "http://localhost:5000/api/boats/search";
+
+        const url = `${baseUrl}${location.search}`;
+
+        const res = await fetch(url, {
+          headers: isAdminView
+            ? { Authorization: `Bearer ${token}` }
+            : {},
+        });
+
         if (!res.ok) throw new Error("Failed to fetch boats");
+
         const data = await res.json();
         setBoats(data);
       } catch (err) {
@@ -51,7 +65,7 @@ export default function Boats() {
     };
 
     fetchBoats();
-  }, [location.search]);
+  }, [location.search, isAdminView, token]);
 
   return (
     <div className="boats-page">
@@ -102,6 +116,7 @@ export default function Boats() {
             ) : (
               <BoatList
                 boats={boats}
+                isAdminView={isAdminView}
                 currentSort={currentSort}
                 onSortChange={handleSortChange}
               />
