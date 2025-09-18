@@ -114,7 +114,17 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
               )}
               <div className="card-body d-flex flex-column">
                 <h5 className="card-title">{boat.name}</h5>
-                <p className="card-text">{boat.type}</p>
+                <p className="card-text">
+                  {boat.type === "katamaranas"
+                    ? "Catamaran"
+                    : boat.type === "jachta"
+                    ? "Sailing Yacht"
+                    : boat.type === "motorinis"
+                    ? "Motorboat"
+                    : boat.type === "valtis"
+                    ? "Small Boat"
+                    : boat.type}
+                </p>
                 <p className="card-text">
                   👥 x {boat.capacity} | 🛏 x {boat.cabins}
                 </p>

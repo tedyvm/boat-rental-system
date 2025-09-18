@@ -85,11 +85,11 @@ export default function BoatFilters({
 
   return (
     <div className="p-3 border rounded bg-light">
-      <h5 className="mb-3">Filtrai</h5>
+      <h5 className="mb-3">Filter</h5>
 
       {/* Datos pasirinkimas */}
       <div className="mb-3 position-relative d-block d-md-none">
-        <label className="form-label">Datos intervalas</label>
+        <label className="form-label">Date range</label>
         <div className="d-flex gap-2">
           <input
             type="text"
@@ -133,7 +133,7 @@ export default function BoatFilters({
                 className="btn btn-sm btn-primary"
                 onClick={() => setShowCalendar(false)}
               >
-                Gerai
+                Done
               </button>
             </div>
           </div>
@@ -150,18 +150,18 @@ export default function BoatFilters({
           }
           className="form-select"
         >
-          <option value="">Visi</option>
-          <option value="katamaranas">Katamaranas</option>
-          <option value="jachta">Jachta</option>
-          <option value="motorinis">Motorinis</option>
-          <option value="valtis">Valtis</option>
+          <option value="">All</option>
+          <option value="katamaranas">Catamaran</option>
+          <option value="jachta">Yacht</option>
+          <option value="motorinis">Speed Boat</option>
+          <option value="valtis">Small boat</option>
         </select>
       </div>
 
       {/* Kainų diapazonas (slider) */}
       <div className="mb-3">
         <label className="form-label d-flex justify-content-between">
-          <span>Kaina (€)</span>
+          <span>Price per day (€)</span>
           <span>
             {filters.priceMin} – {filters.priceMax}
           </span>
@@ -206,7 +206,7 @@ export default function BoatFilters({
       {/* Min. vietų (slider) */}
       <div className="mb-3">
         <label className="form-label d-flex justify-content-between">
-          <span>Vietos</span>
+          <span>Max people</span>
           <span>{filters.capacityMin}+</span>
         </label>
         <Slider
