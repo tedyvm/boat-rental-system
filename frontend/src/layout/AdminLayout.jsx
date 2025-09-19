@@ -20,8 +20,8 @@ export default function AdminLayout() {
           <NavLink to="/admin/boats/new" className="nav-link text-white">
             Add Boat
           </NavLink>
-          <NavLink to="/admin/orders" className="nav-link text-white">
-            Order List
+          <NavLink to="/admin/reservations" className="nav-link text-white">
+            Reservation List
           </NavLink>
           <NavLink to="/admin/users" className="nav-link text-white">
             User Management

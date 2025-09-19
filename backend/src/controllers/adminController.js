@@ -180,6 +180,7 @@ const updateReservationStatus = asyncHandler(async (req, res) => {
   await reservation.save();
   res.json(reservation);
 });
+
 const getBoatByIdAdmin = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
   if (!boat) {
