@@ -3,7 +3,7 @@ const Boat = require("../models/Boat");
 const User = require("../models/User");
 const Review = require("../models/Review");
 const Reservation = require("../models/Reservation");
-const {recalcBoatRating} = require("./reviewController");
+const { recalcBoatRating } = require("./reviewController");
 
 //USERS
 
@@ -211,6 +211,25 @@ const updateReservationStatus = asyncHandler(async (req, res) => {
   res.json(reservation);
 });
 
+const deleteReservation = asyncHandler(async (req, res) => {
+  const reservation = await Reservation.findById(req.params.id);
+  if (!reservation) {
+    res.status(404);
+    throw new Error("Reservation not found");
+  }
+
+  // Leidžiame trinti tik completed, cancelled arba rejected
+  if (!["completed", "cancelled", "rejected"].includes(reservation.status)) {
+    res.status(400);
+    throw new Error(
+      "Only completed, cancelled or rejected reservations can be deleted"
+    );
+  }
+
+  await reservation.deleteOne();
+  res.json({ message: "Reservation deleted successfully" });
+});
+
 const getBoatByIdAdmin = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
   if (!boat) {
@@ -271,4 +290,5 @@ module.exports = {
   getBoatByIdAdmin,
   getAllReviews,
   deleteReviewAdmin,
+  deleteReservation,
 };

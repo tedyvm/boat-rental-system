@@ -21,9 +21,12 @@ export default function AdminOrdersList() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/admin/reservations", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "http://localhost:5000/api/admin/reservations",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (!res.ok) throw new Error("Failed to fetch reservations");
         const data = await res.json();
         setOrders(data);
@@ -40,7 +43,14 @@ export default function AdminOrdersList() {
 
   useEffect(() => {
     handleFilterAndSort();
-  }, [selectedStatus, boatSearch, userSearch, sortField, sortDirection, orders]);
+  }, [
+    selectedStatus,
+    boatSearch,
+    userSearch,
+    sortField,
+    sortDirection,
+    orders,
+  ]);
 
   const handleFilterAndSort = () => {
     let filtered = [...orders];
@@ -141,17 +151,34 @@ export default function AdminOrdersList() {
       <table className="table table-striped table-hover">
         <thead>
           <tr>
-            <th onClick={() => handleSort("boat")} style={{ cursor: "pointer" }}>
-              Boat {sortField === "boat" && (sortDirection === "asc" ? "↑" : "↓")}
+            <th
+              onClick={() => handleSort("boat")}
+              style={{ cursor: "pointer" }}
+            >
+              Boat{" "}
+              {sortField === "boat" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
-            <th onClick={() => handleSort("user")} style={{ cursor: "pointer" }}>
-              User {sortField === "user" && (sortDirection === "asc" ? "↑" : "↓")}
+            <th
+              onClick={() => handleSort("user")}
+              style={{ cursor: "pointer" }}
+            >
+              User{" "}
+              {sortField === "user" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
-            <th onClick={() => handleSort("startDate")} style={{ cursor: "pointer" }}>
-              Start Date {sortField === "startDate" && (sortDirection === "asc" ? "↑" : "↓")}
+            <th
+              onClick={() => handleSort("startDate")}
+              style={{ cursor: "pointer" }}
+            >
+              Start Date{" "}
+              {sortField === "startDate" &&
+                (sortDirection === "asc" ? "↑" : "↓")}
             </th>
-            <th onClick={() => handleSort("endDate")} style={{ cursor: "pointer" }}>
-              End Date {sortField === "endDate" && (sortDirection === "asc" ? "↑" : "↓")}
+            <th
+              onClick={() => handleSort("endDate")}
+              style={{ cursor: "pointer" }}
+            >
+              End Date{" "}
+              {sortField === "endDate" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
             <th>Status</th>
             <th>Actions</th>
@@ -184,7 +211,7 @@ export default function AdminOrdersList() {
               </td>
               <td>
                 <button
-                  className="btn btn-sm btn-primary"
+                  className="btn btn-sm btn-primary me-2"
                   onClick={(e) => {
                     e.stopPropagation();
                     navigate(`/admin/reservations/${o._id}`);
@@ -192,6 +219,44 @@ export default function AdminOrdersList() {
                 >
                   Edit
                 </button>
+
+                {(o.status === "completed" ||
+                  o.status === "rejected" ||
+                  o.status === "cancelled") && (
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (
+                        !window.confirm(
+                          "Are you sure you want to delete this reservation?"
+                        )
+                      )
+                        return;
+
+                      try {
+                        const res = await fetch(
+                          `http://localhost:5000/api/admin/reservations/${o._id}`,
+                          {
+                            method: "DELETE",
+                            headers: { Authorization: `Bearer ${token}` },
+                          }
+                        );
+
+                        if (!res.ok)
+                          throw new Error("Failed to delete reservation");
+                        setOrders((prev) =>
+                          prev.filter((r) => r._id !== o._id)
+                        );
+                      } catch (err) {
+                        console.error("Failed to delete reservation", err);
+                        alert("Could not delete reservation");
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
             </tr>
           ))}
