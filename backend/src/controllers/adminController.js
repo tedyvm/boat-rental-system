@@ -4,6 +4,34 @@ const User = require("../models/User");
 const Reservation = require("../models/Reservation");
 
 //USERS
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const count = await User.countDocuments({});
+  const users = await User.find({})
+    .select("-password")
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.json({
+    users,
+    page,
+    pages: Math.ceil(count / limit),
+  });
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  res.json(user);
+});
+
 const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) {
@@ -196,6 +224,8 @@ module.exports = {
   updateBoat,
   deleteBoat,
   updateUser,
+  getAllUsers,
+  getUserById,
   deleteUser,
   getAllReservations,
   updateReservationStatus,

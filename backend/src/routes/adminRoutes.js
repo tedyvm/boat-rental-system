@@ -9,9 +9,14 @@ const {
   updateUser,
   deleteUser, getAllReservations, updateReservationStatus,
   getBoatByIdAdmin,
+  getAllUsers,
+  getUserById,
 } = require("../controllers/adminController");
 
 // USERS
+
+router.get("/users", protect, admin, getAllUsers);
+router.get("/users/:id", protect, admin, getUserById);
 router.put("/users/:id", protect, admin, updateUser); // Adminas redaguoja bet kurį
 router.delete("/users/:id", protect, admin, deleteUser); // Adminas trina bet kurį
 
