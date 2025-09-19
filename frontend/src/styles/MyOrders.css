@@ -1,0 +1,7 @@
+.orders-bg {
+  height: 150px;
+  background: url("/images/boats-header.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 45%; /* perkelia 20% žemyn */
+}

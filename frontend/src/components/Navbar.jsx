@@ -118,6 +118,13 @@ export default function Navbar() {
                 className="position-absolute bg-white border rounded shadow p-2"
                 style={{ top: "100%", right: 0, zIndex: 1000 }}
               >
+                {user && (
+                  <li className="nav-item">
+                    <a className="nav-link" href="/reservations/me">
+                      My Orders
+                    </a>
+                  </li>
+                )}
                 <button
                   onClick={() => {
                     logout();
