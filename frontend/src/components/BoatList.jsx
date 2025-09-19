@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import "../styles/BoatList.css";
 import StarRating from "../components/StarRating";
 
-
 export default function BoatList({ boats, currentSort, onSortChange }) {
   const location = useLocation();
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -102,9 +101,12 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
 
       {/* Boat cards */}
       <div className="row">
-        {boats.map((boat) => (
+        {boats.map((boat, index) => (
           <div key={boat._id} className="col-md-6 mb-4">
-            <div className="card h-100 shadow-sm">
+            <div
+              className="card h-100 shadow-sm boat-card"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
               {boat.images?.[0] && (
                 <img
                   src={boat.images[0]}

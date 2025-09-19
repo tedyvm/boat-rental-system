@@ -47,23 +47,49 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
   const [monthsToShow, setMonthsToShow] = useState(1);
 
   const buildParams = (updated = {}) => {
-    const filters = {
-      type,
-      withCaptain,
-      startDate: dateRange[0].startDate,
-      endDate: dateRange[0].endDate,
-      ...updated,
-    };
+    // paimam esamus parametrus iš URL
+    const currentParams = new URLSearchParams(location.search);
 
-    const params = new URLSearchParams();
-    if (filters.type) params.set("type", filters.type);
-    if (filters.withCaptain) params.set("withCaptain", true);
-    if (filters.startDate)
-      params.set("startDate", format(filters.startDate, "yyyy-MM-dd"));
-    if (filters.endDate)
-      params.set("endDate", format(filters.endDate, "yyyy-MM-dd"));
+    // atnaujinam tik tuos, kuriuos valdo SearchBar
+    if ("type" in updated || type) {
+      if (updated.type || type) {
+        currentParams.set("type", updated.type ?? type);
+      } else {
+        currentParams.delete("type");
+      }
+    }
 
-    return params;
+    if ("withCaptain" in updated || withCaptain) {
+      if (updated.withCaptain ?? withCaptain) {
+        currentParams.set("withCaptain", true);
+      } else {
+        currentParams.delete("withCaptain");
+      }
+    }
+
+    if ("startDate" in updated || dateRange[0].startDate) {
+      if (updated.startDate || dateRange[0].startDate) {
+        currentParams.set(
+          "startDate",
+          format(updated.startDate ?? dateRange[0].startDate, "yyyy-MM-dd")
+        );
+      } else {
+        currentParams.delete("startDate");
+      }
+    }
+
+    if ("endDate" in updated || dateRange[0].endDate) {
+      if (updated.endDate || dateRange[0].endDate) {
+        currentParams.set(
+          "endDate",
+          format(updated.endDate ?? dateRange[0].endDate, "yyyy-MM-dd")
+        );
+      } else {
+        currentParams.delete("endDate");
+      }
+    }
+
+    return currentParams;
   };
 
   const handleDateChange = (item) => {

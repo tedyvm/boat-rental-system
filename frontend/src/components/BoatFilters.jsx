@@ -61,6 +61,8 @@ export default function BoatFilters({
   }, [maxPrice, maxCapacity]);
 
   useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+
     const cleaned = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v !== "" && v != null)
     );
@@ -70,14 +72,37 @@ export default function BoatFilters({
     if (cleaned.endDate)
       cleaned.endDate = format(cleaned.endDate, "yyyy-MM-dd");
 
-    // išskiriam yearRange į atskirus laukus
     if (Array.isArray(cleaned.yearRange)) {
       cleaned.yearMin = cleaned.yearRange[0];
       cleaned.yearMax = cleaned.yearRange[1];
       delete cleaned.yearRange;
     }
 
-    onChange(cleaned);
+    // 💡 Perrašom tik tuos laukus, kuriuos valdome
+    for (const key of Object.keys(cleaned)) {
+      currentParams.set(key, cleaned[key]);
+    }
+
+    // 💡 Ištrinam laukus, kurie buvo tušti (kad jų neliktų URL)
+    const controlledKeys = [
+      "priceMin",
+      "priceMax",
+      "withCaptain",
+      "capacityMin",
+      "yearMin",
+      "yearMax",
+      "cabinsMin",
+      "lengthMin",
+      "startDate",
+      "endDate",
+    ];
+
+    controlledKeys.forEach((key) => {
+      if (!(key in cleaned)) currentParams.delete(key);
+    });
+
+    // iškviečiam parent callback su NAUJAIS parametrais
+    onChange(Object.fromEntries(currentParams.entries()));
   }, [filters]);
 
   const handleDateChange = (item) => {

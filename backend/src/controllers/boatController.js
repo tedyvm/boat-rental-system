@@ -29,30 +29,63 @@ const searchBoats = asyncHandler(async (req, res) => {
     withCaptain,
     ratingMin,
     sort,
+    yearMin,
+    yearMax,
+    lengthMin,
+    lengthMax,
+    cabinsMin,
+    location,
   } = req.query;
 
   let filter = { status: "published" };
 
+  // Type
   if (type) filter.type = type;
+
+  // Price range
   if (priceMin || priceMax) filter.pricePerDay = {};
   if (priceMin) filter.pricePerDay.$gte = Number(priceMin);
   if (priceMax) filter.pricePerDay.$lte = Number(priceMax);
+
+  // Capacity
   if (capacityMin || capacityMax) filter.capacity = {};
   if (capacityMin) filter.capacity.$gte = Number(capacityMin);
   if (capacityMax) filter.capacity.$lte = Number(capacityMax);
+
+  // Captain
   if (withCaptain !== undefined) filter.withCaptain = withCaptain === "true";
+
+  // Rating
   if (ratingMin) filter.rating = { $gte: Number(ratingMin) };
 
-  // Paruošiam sort objektą pagal URL query
+  // Year range
+  if (yearMin || yearMax) filter.year = {};
+  if (yearMin) filter.year.$gte = Number(yearMin);
+  if (yearMax) filter.year.$lte = Number(yearMax);
+
+  // Length range
+  if (lengthMin || lengthMax) filter.length = {};
+  if (lengthMin) filter.length.$gte = Number(lengthMin);
+  if (lengthMax) filter.length.$lte = Number(lengthMax);
+
+  // Cabins
+  if (cabinsMin) filter.cabins = { $gte: Number(cabinsMin) };
+
+  // Location (search as case-insensitive partial match)
+  if (location)
+    filter.location = { $regex: location, $options: "i" };
+
+  // Sort
   let sortOption = {};
   if (sort === "price-asc") sortOption = { pricePerDay: 1 };
   if (sort === "price-desc") sortOption = { pricePerDay: -1 };
   if (sort === "capacity") sortOption = { capacity: -1 };
+  if (!sort) sortOption = { createdAt: -1 };
 
-  // Filtruojam ir rūšiuojam
+  // Filtruojam
   let boats = await Boat.find(filter).sort(sortOption);
 
-  // Tikrinam rezervacijų konfliktus (laisvumą)
+  // Tikrinam rezervacijas
   if (startDate && endDate) {
     const sDate = new Date(startDate);
     const eDate = new Date(endDate);
@@ -61,7 +94,7 @@ const searchBoats = asyncHandler(async (req, res) => {
       boats.map(async (boat) => {
         const conflict = await Reservation.findOne({
           boat: boat._id,
-          status: { $in: ["pending", "approved", "active"] }, // ✅ TIK aktyvios
+          status: { $in: ["pending", "approved", "active"] },
           startDate: { $lte: eDate },
           endDate: { $gte: sDate },
         });
@@ -74,6 +107,7 @@ const searchBoats = asyncHandler(async (req, res) => {
 
   res.json(boats);
 });
+
 const getBookedDates = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
