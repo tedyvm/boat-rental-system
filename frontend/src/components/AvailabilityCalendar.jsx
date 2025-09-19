@@ -41,26 +41,38 @@ export default function AvailabilityCalendar({
     return date >= start && date <= end;
   };
 
-  const isDateBooked = (date) => {
-    return bookedDates.some((range) => {
-      const start = new Date(range.startDate);
-      const end = new Date(range.endDate);
+const normalizeDate = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
-      // ✅ jeigu excludeRange sutampa su šia rezervacija – praleidžiam
-      if (excludeRange) {
-        const excludeStart = new Date(excludeRange[0]);
-        const excludeEnd = new Date(excludeRange[1]);
-        if (
-          start.getTime() === excludeStart.getTime() &&
-          end.getTime() === excludeEnd.getTime()
-        ) {
-          return false; // neblokuojam šio intervalo
-        }
+const isDateBooked = (date) => {
+  const day = normalizeDate(date);
+
+  return bookedDates.some((range) => {
+    const start = normalizeDate(range.startDate);
+    const end = normalizeDate(range.endDate);
+
+    // ✅ Įskaičiuojam pilną paskutinę dieną
+    end.setHours(23, 59, 59, 999);
+
+    if (excludeRange) {
+      const excludeStart = normalizeDate(excludeRange[0]);
+      const excludeEnd = normalizeDate(excludeRange[1]);
+      excludeEnd.setHours(23, 59, 59, 999);
+
+      if (start.getTime() === excludeStart.getTime() &&
+          end.getTime() === excludeEnd.getTime()) {
+        return false;
       }
+    }
 
-      return date >= start && date <= end;
-    });
-  };
+    return day >= start && day <= end;
+  });
+};
+
+
 
   return (
     <DateRange

@@ -7,7 +7,6 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const dropdownRef = useRef(null);
 
-  // uždarom dropdown paspaudus už ribų
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -99,7 +98,7 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
         </div>
       </div>
 
-      {/* Kortelės */}
+      {/* Boat cards */}
       <div className="row">
         {boats.map((boat) => (
           <div key={boat._id} className="col-md-6 mb-4">
@@ -114,21 +113,24 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
               )}
               <div className="card-body d-flex flex-column">
                 <h5 className="card-title">{boat.name}</h5>
+                
+                {/* TYPE iš modelio */}
+                <p className="card-text">{boat.type}</p>
+
+                {/* Nauji laukai */}
                 <p className="card-text">
-                  {boat.type === "katamaranas"
-                    ? "Catamaran"
-                    : boat.type === "jachta"
-                    ? "Sailing Yacht"
-                    : boat.type === "motorinis"
-                    ? "Motorboat"
-                    : boat.type === "valtis"
-                    ? "Small Boat"
-                    : boat.type}
+                  📍 {boat.location} | 📅 {boat.year}
                 </p>
+
+                {/* Specifikacijos */}
                 <p className="card-text">
-                  👥 x {boat.capacity} | 🛏 x {boat.cabins}
+                  👥 x {boat.capacity} | 🛏 x {boat.cabins} | 📏 {boat.length} m
                 </p>
-                <p className="fw-bold ms-auto">From {boat.pricePerDay} €/day</p>
+
+                <p className="fw-bold ms-auto">
+                  From {boat.pricePerDay} €/day
+                </p>
+
                 <a
                   href={`/boats/${boat._id}${location.search}`}
                   className="btn btn-primary ms-auto button"

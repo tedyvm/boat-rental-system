@@ -3,15 +3,38 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    familyName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     username: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    country: {
+      type: String,
+      required: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -26,7 +49,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Password hash prieš save
+// Hash password before save
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
@@ -34,7 +57,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Method: password palyginimui
+// Password check
 userSchema.methods.matchPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

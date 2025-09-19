@@ -7,19 +7,48 @@ const generateToken = (user) => {
   });
 };
 
-// Register
+// ==================== REGISTER ====================
 exports.register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, familyName, username, email, phone, country, password } =
+    req.body;
+
   try {
+    if (
+      !name ||
+      !familyName ||
+      !username ||
+      !email ||
+      !phone ||
+      !country ||
+      !password
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please fill in all required fields" });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists)
       return res.status(400).json({ message: "User already exists" });
 
-    const user = await User.create({ username, email, password });
+    const user = await User.create({
+      name,
+      familyName,
+      username,
+      email,
+      phone,
+      country,
+      password,
+    });
+
     res.status(201).json({
       _id: user._id,
+      name: user.name,
+      familyName: user.familyName,
       username: user.username,
       email: user.email,
+      phone: user.phone,
+      country: user.country,
       role: user.role,
       token: generateToken(user),
     });
@@ -28,7 +57,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login
+// ==================== LOGIN ====================
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -41,8 +70,12 @@ exports.login = async (req, res) => {
 
     res.json({
       _id: user._id,
+      name: user.name,
+      familyName: user.familyName,
       username: user.username,
       email: user.email,
+      phone: user.phone,
+      country: user.country,
       role: user.role,
       token: generateToken(user),
     });

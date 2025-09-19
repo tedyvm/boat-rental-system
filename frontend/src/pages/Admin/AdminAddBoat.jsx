@@ -11,6 +11,11 @@ export default function AdminAddBoat() {
   const [boat, setBoat] = useState({
     name: "",
     type: "Catamaran",
+    location: "",
+    year: new Date().getFullYear(),
+    length: 10,
+    cabins: 0,
+    engine: "",
     description: "",
     pricePerDay: 0,
     capacity: 1,
@@ -26,7 +31,12 @@ export default function AdminAddBoat() {
     const { name, value, type, checked } = e.target;
     setBoat((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : type === "number"
+          ? Number(value)
+          : value,
     }));
   };
 
@@ -44,7 +54,7 @@ export default function AdminAddBoat() {
       images: [...prev.images, ...newImages],
     }));
 
-    e.target.value = ""; // išvalom input, kad galėtum įkelti tas pačias nuotraukas dar kartą
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index) => {
@@ -58,13 +68,22 @@ export default function AdminAddBoat() {
     e.preventDefault();
     try {
       setSaving(true);
+      const payload = {
+        ...boat,
+        year: Number(boat.year),
+        length: Number(boat.length),
+        cabins: Number(boat.cabins),
+        engine: Number(boat.engine),
+        pricePerDay: Number(boat.pricePerDay),
+        capacity: Number(boat.capacity),
+      };
       const res = await fetch("http://localhost:5000/api/admin/boats", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(boat),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to create boat");
@@ -79,7 +98,6 @@ export default function AdminAddBoat() {
     }
   };
 
-  // react-image-gallery elementai su "Remove" mygtukais
   const galleryItems = boat.images.map((img, index) => ({
     original: img,
     thumbnail: img,
@@ -108,7 +126,7 @@ export default function AdminAddBoat() {
       )}
 
       <form onSubmit={handleSubmit}>
-        {/* Upload mygtukas */}
+        {/* Images */}
         <div className="mb-3">
           <label className="form-label">Add Images</label>
           <input
@@ -120,7 +138,7 @@ export default function AdminAddBoat() {
           />
         </div>
 
-        {/* Kiti formos laukai */}
+        {/* Basic info */}
         <div className="mb-3">
           <label className="form-label">Name</label>
           <input
@@ -141,11 +159,72 @@ export default function AdminAddBoat() {
             value={boat.type}
             onChange={handleChange}
           >
-            <option value="katamaranas">Catamaran</option>
-            <option value="jachta">Sailing Yacht</option>
-            <option value="motorinis">Speed boat</option>
-            <option value="valtis">Small boat</option>
+            <option value="Catamaran">Catamaran</option>
+            <option value="Sailing Yacht">Sailing Yacht</option>
+            <option value="Speed Boat">Speed Boat</option>
+            <option value="Small Boat">Small Boat</option>
           </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Location</label>
+          <input
+            type="text"
+            name="location"
+            className="form-control"
+            value={boat.location}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Technical specs */}
+        <div className="row">
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Year</label>
+            <input
+              type="number"
+              name="year"
+              className="form-control"
+              value={boat.year}
+              min="1980"
+              max={new Date().getFullYear()}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Length (m)</label>
+            <input
+              type="number"
+              step="0.1"
+              name="length"
+              className="form-control"
+              value={boat.length}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Cabins</label>
+            <input
+              type="number"
+              name="cabins"
+              className="form-control"
+              value={boat.cabins}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Engine</label>
+          <input
+            type="text"
+            name="engine"
+            className="form-control"
+            value={boat.engine}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
@@ -159,8 +238,9 @@ export default function AdminAddBoat() {
           />
         </div>
 
+        {/* Pricing & status */}
         <div className="mb-3">
-          <label className="form-label">Price Per Day</label>
+          <label className="form-label">Price Per Day (€)</label>
           <input
             type="number"
             name="pricePerDay"

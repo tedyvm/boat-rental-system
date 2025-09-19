@@ -69,36 +69,22 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // BOATS
 const createBoat = asyncHandler(async (req, res) => {
-  const {
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status,
-  } = req.body;
 
-  const boatExists = await Boat.findOne({ name });
+  const boatExists = await Boat.findOne({ name: req.body.name });
   if (boatExists) {
     res.status(400);
     throw new Error("Boat already exists");
   }
 
-  const boat = await Boat.create({
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status: status || "draft",
-  });
-
-  res.status(201).json(boat);
+  try {
+    const boat = await Boat.create(req.body);
+    res.status(201).json(boat);
+  } catch (err) {
+    console.error("❌ Failed to create boat:", err);
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
   const { search, type, status, sort, page = 1, limit = 10 } = req.query;
@@ -140,29 +126,17 @@ const updateBoat = asyncHandler(async (req, res) => {
     throw new Error("Boat not found");
   }
 
-  const {
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status,
-  } = req.body;
+  Object.assign(boat, req.body); // perrašo laukus, kuriuos atsiuntė klientas
 
-  boat.type = type || boat.type;
-  boat.name = name || boat.name;
-  boat.description = description || boat.description;
-  boat.pricePerDay = pricePerDay || boat.pricePerDay;
-  boat.capacity = capacity || boat.capacity;
-  boat.withCaptain = withCaptain !== undefined ? withCaptain : boat.withCaptain;
-  boat.images = images || boat.images;
-  boat.status = status || boat.status;
-
-  const updatedBoat = await boat.save();
-  res.json(updatedBoat);
+  try {
+    const updatedBoat = await boat.save();
+    res.json(updatedBoat);
+  } catch (err) {
+    console.error("❌ Failed to update boat:", err);
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 const deleteBoat = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);

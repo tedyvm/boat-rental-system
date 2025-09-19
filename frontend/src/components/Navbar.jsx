@@ -1,21 +1,30 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/Navbar.css";
+import LoginModal from "./LoginModal";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setMenuOpen(false);
+    navigate("/");
+  };
 
   return (
-    <header className="navbar-custom">
+    <header key={user?._id || "guest"} className="navbar-custom">
       <div className="navbar-container">
-        {/* Kairė – LOGO */}
+        {/* LOGO */}
         <Link to="/" className="navbar-logo col-md-3 col-sm-6">
           <img src="/images/logo.svg" alt="Logo" />
         </Link>
 
-        {/* Vidurys – kontaktai */}
+        {/* Kontaktai */}
         <div className="navbar-contacts col-md-6 d-none d-md-flex justify-content-center">
           <div className="contact-item">
             <svg
@@ -28,9 +37,9 @@ export default function Navbar() {
               <path
                 d="M30.9991 24.4397V29.0342C31.0008 29.4607 30.9147 29.8829 30.7464 30.2737C30.5781 30.6645 30.3313 31.0153 30.0217 31.3037C29.7122 31.592 29.3467 31.8116 28.9488 31.9482C28.5508 32.0848 28.1292 32.1356 27.7108 32.0972C23.0692 31.5851 18.6106 29.9748 14.6934 27.3955C11.0488 25.0441 7.95889 21.9068 5.64301 18.2065C3.09379 14.2111 1.50736 9.66219 1.01224 4.92832C0.974549 4.50481 1.02412 4.07797 1.1578 3.67497C1.29149 3.27198 1.50635 2.90166 1.78871 2.5876C2.07108 2.27354 2.41475 2.02261 2.79786 1.8508C3.18097 1.67898 3.59512 1.59004 4.01394 1.58964H8.53912C9.27115 1.58233 9.98083 1.84552 10.5359 2.33017C11.0909 2.81482 11.4534 3.48786 11.5559 4.22383C11.7469 5.69417 12.1011 7.13786 12.6118 8.52735C12.8147 9.07552 12.8586 9.67126 12.7383 10.244C12.618 10.8167 12.3386 11.3424 11.933 11.7588L10.0173 13.7038C12.1646 17.538 15.2914 20.7127 19.0677 22.8929L20.9833 20.9479C21.3935 20.5361 21.9112 20.2523 22.4753 20.1302C23.0394 20.008 23.6262 20.0526 24.1661 20.2587C25.5346 20.7772 26.9565 21.1368 28.4046 21.3307C29.1374 21.4357 29.8065 21.8104 30.2849 22.3836C30.7633 22.9569 31.0174 23.6886 30.9991 24.4397Z"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
             <span>+370 66 151515</span>
@@ -46,54 +55,37 @@ export default function Navbar() {
               <path
                 d="M4 1.64151H28C29.65 1.64151 31 3.01492 31 4.69352V23.0056C31 24.6842 29.65 26.0576 28 26.0576H4C2.35 26.0576 1 24.6842 1 23.0056V4.69352C1 3.01492 2.35 1.64151 4 1.64151Z"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M31 4.69353L16 15.3756L1 4.69353"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
-
             <span>info@sailgo.com</span>
           </div>
         </div>
 
-        {/* Dešinė pusė – login arba user meniu */}
+        {/* Dešinė pusė */}
         {!user ? (
-          <Link
-            to="/login"
-            className="navbar-login col-md-3 col-sm-6 d-flex justify-content-end pe-3"
+          <button
+            className="navbar-login col-md-3 col-sm-6 d-flex justify-content-end pe-3 btn btn-link text-white text-decoration-none"
+            onClick={() => setShowLogin(true)}
           >
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clip-path="url(#clip0_750_1859)">
-                <path
-                  d="M30 14.985C30 6.7125 23.28 0 15 0C6.72 0 0 6.7125 0 14.985C0 19.5413 2.07 23.6475 5.31 26.4037C5.34 26.4338 5.37 26.4338 5.37 26.4638C5.64 26.6738 5.91 26.8838 6.21 27.0938C6.36 27.1838 6.48 27.3019 6.63 27.4219C9.10888 29.1026 12.0351 30.0007 15.03 30C18.0249 30.0007 20.9511 29.1026 23.43 27.4219C23.58 27.3319 23.7 27.2138 23.85 27.1219C24.12 26.9138 24.42 26.7038 24.69 26.4938C24.72 26.4638 24.75 26.4637 24.75 26.4338C27.93 23.6456 30 19.5413 30 14.985ZM15 28.1119C12.18 28.1119 9.6 27.2119 7.47 25.7138C7.5 25.4738 7.56 25.2356 7.62 24.9956C7.79876 24.3452 8.06094 23.7206 8.4 23.1375C8.73 22.5675 9.12 22.0575 9.6 21.6075C10.05 21.1575 10.59 20.7394 11.13 20.4094C11.7 20.0794 12.3 19.8394 12.96 19.6594C13.6251 19.4801 14.3111 19.3899 15 19.3913C17.045 19.3768 19.0148 20.1612 20.49 21.5775C21.18 22.2675 21.72 23.0775 22.11 24.0056C22.32 24.5456 22.47 25.1156 22.56 25.7138C20.346 27.2703 17.7064 28.1076 15 28.1119ZM10.41 14.2369C10.1457 13.6317 10.0127 12.9773 10.02 12.3169C10.02 11.6587 10.14 10.9987 10.41 10.3988C10.68 9.79875 11.04 9.26062 11.49 8.81063C11.94 8.36063 12.48 8.0025 13.08 7.7325C13.68 7.4625 14.34 7.3425 15 7.3425C15.69 7.3425 16.32 7.4625 16.92 7.7325C17.52 8.0025 18.06 8.3625 18.51 8.81063C18.96 9.26062 19.32 9.80062 19.59 10.3988C19.86 10.9987 19.98 11.6587 19.98 12.3169C19.98 13.0069 19.86 13.6369 19.59 14.235C19.3294 14.8261 18.9635 15.3649 18.51 15.825C18.0497 16.2778 17.511 16.6431 16.92 16.9031C15.6803 17.4126 14.2897 17.4126 13.05 16.9031C12.459 16.6431 11.9203 16.2778 11.46 15.825C11.0059 15.3716 10.6487 14.8325 10.41 14.2369ZM24.33 24.1856C24.33 24.1256 24.3 24.0956 24.3 24.0356C24.0049 23.097 23.5701 22.2083 23.01 21.3994C22.4494 20.5845 21.7605 19.8658 20.97 19.2713C20.3663 18.8171 19.7119 18.4345 19.02 18.1313C19.3348 17.9236 19.6264 17.6828 19.89 17.4131C20.3373 16.9716 20.7301 16.4781 21.06 15.9431C21.7244 14.8515 22.0676 13.5947 22.05 12.3169C22.0593 11.371 21.8755 10.4331 21.51 9.56063C21.1491 8.71995 20.6296 7.95667 19.98 7.3125C19.3313 6.67506 18.5679 6.16611 17.73 5.8125C16.8561 5.44761 15.917 5.26452 14.97 5.27437C14.0229 5.26511 13.0838 5.44885 12.21 5.81438C11.3649 6.16723 10.5996 6.68697 9.96 7.3425C9.32258 7.99048 8.81361 8.75329 8.46 9.59062C8.09447 10.4631 7.91072 11.401 7.92 12.3469C7.92 13.0069 8.01 13.6369 8.19 14.235C8.37 14.865 8.61 15.435 8.94 15.9731C9.24 16.5131 9.66 16.9931 10.11 17.4431C10.38 17.7131 10.68 17.9513 11.01 18.1613C10.3159 18.4726 9.66135 18.8654 9.06 19.3313C8.28 19.9313 7.59 20.6494 7.02 21.4294C6.45424 22.2349 6.0189 23.1246 5.73 24.0656C5.7 24.1256 5.7 24.1856 5.7 24.2156C3.33 21.8175 1.86 18.5813 1.86 14.985C1.86 7.7625 7.77 1.85813 15 1.85813C22.23 1.85813 28.14 7.7625 28.14 14.985C28.1361 18.4349 26.7662 21.7429 24.33 24.1856Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_750_1859">
-                  <rect width="30" height="30" fill="white" />
-                </clipPath>
-              </defs>
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+              {/* login icon */}
             </svg>
             <span className="ms-2">Log In</span>
-          </Link>
+          </button>
         ) : (
-          <div className="col-md-3  col-sm-6 d-flex justify-content-end align-items-center pe-3 position-relative">
+          <div className="col-md-3 col-sm-6 d-flex justify-content-end align-items-center pe-3 position-relative">
             <span className="me-2 contact-item">
-              Welcome, <b>{user.name}</b>
+              Welcome, <b>{user.name || user.username}</b>
             </span>
 
             <button
@@ -101,7 +93,6 @@ export default function Navbar() {
               onClick={() => setMenuOpen((prev) => !prev)}
               style={{ background: "none", border: "none" }}
             >
-              {/* Burger icon */}
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                 <path
                   color="white"
@@ -118,18 +109,13 @@ export default function Navbar() {
                 className="position-absolute bg-white border rounded shadow p-2"
                 style={{ top: "100%", right: 0, zIndex: 1000 }}
               >
-                {user && (
-                  <li className="nav-item">
-                    <a className="nav-link" href="/reservations/me">
-                      My Orders
-                    </a>
-                  </li>
-                )}
+                <li className="nav-item">
+                  <Link className="nav-link" to="/reservations/me">
+                    My Orders
+                  </Link>
+                </li>
                 <button
-                  onClick={() => {
-                    logout();
-                    setMenuOpen(false);
-                  }}
+                  onClick={handleLogout}
                   className="btn btn-link text-danger text-decoration-none"
                 >
                   Logout
@@ -139,6 +125,16 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {/* Login Modal */}
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onSuccess={() => {
+            setShowLogin(false);
+          }}
+        />
+      )}
     </header>
   );
 }

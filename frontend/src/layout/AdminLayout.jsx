@@ -1,9 +1,16 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Navigate, Outlet, NavLink } from "react-router-dom";
+import { Navigate, Outlet, NavLink, useNavigate} from "react-router-dom";
 
 export default function AdminLayout() {
   const { user } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    logout();
+    navigate("/");
+  }
 
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== "admin") return <Navigate to="/" replace />;
@@ -29,6 +36,12 @@ export default function AdminLayout() {
           <NavLink to="/admin/reviews" className="nav-link text-white">
             Reviews
           </NavLink>
+          <button
+            onClick={handleSubmit}
+            className="btn btn-outline-light mt-3 text-start"
+          >
+            Logout
+          </button>
         </nav>
       </aside>
 

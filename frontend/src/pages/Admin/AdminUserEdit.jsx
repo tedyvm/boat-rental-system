@@ -7,12 +7,17 @@ export default function AdminUserEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("user");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    familyName: "",
+    country: "",
+    phone: "",
+    username: "",
+    email: "",
+    role: "user",
+    password: "",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,10 +28,16 @@ export default function AdminUserEdit() {
         });
         if (!res.ok) throw new Error("Failed to fetch user");
         const data = await res.json();
-        setUser(data);
-        setUsername(data.username);
-        setEmail(data.email);
-        setRole(data.role);
+        setForm({
+          name: data.name || "",
+          familyName: data.familyName || "",
+          country: data.country || "",
+          phone: data.phone || "",
+          username: data.username || "",
+          email: data.email || "",
+          role: data.role || "user",
+          password: "",
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -37,16 +48,24 @@ export default function AdminUserEdit() {
     fetchUser();
   }, [id, token]);
 
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      const payload = { ...form };
+      if (!payload.password) delete payload.password; // jei tuščias, nesiunčiam
+
       const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ username, email, role, password }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -64,7 +83,6 @@ export default function AdminUserEdit() {
   };
 
   if (loading) return <p>Loading user...</p>;
-  if (!user) return <p className="text-danger">User not found</p>;
 
   return (
     <div className="container mt-4">
@@ -72,12 +90,61 @@ export default function AdminUserEdit() {
       <div className="card p-3 shadow-sm">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
+            <label className="form-label fw-bold">Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Family Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="familyName"
+              value={form.familyName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Country</label>
+            <input
+              type="text"
+              className="form-control"
+              name="country"
+              value={form.country}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label fw-bold">Phone</label>
+            <input
+              type="text"
+              className="form-control"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
             <label className="form-label fw-bold">Username</label>
             <input
               type="text"
               className="form-control"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="username"
+              value={form.username}
+              onChange={handleChange}
               required
             />
           </div>
@@ -87,8 +154,9 @@ export default function AdminUserEdit() {
             <input
               type="email"
               className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={form.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -97,8 +165,9 @@ export default function AdminUserEdit() {
             <label className="form-label fw-bold">Role</label>
             <select
               className="form-select"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+              name="role"
+              value={form.role}
+              onChange={handleChange}
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -110,9 +179,10 @@ export default function AdminUserEdit() {
             <input
               type="password"
               className="form-control"
+              name="password"
               placeholder="Leave blank to keep current password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange}
             />
           </div>
 

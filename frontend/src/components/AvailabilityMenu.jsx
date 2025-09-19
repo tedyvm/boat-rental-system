@@ -6,7 +6,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../styles/Availability.css";
 
-export default function AvailabilityMenu({ onReserve, pricePerDay }) { // ✅ PAKEISTA: pridėtas pricePerDay
+export default function AvailabilityMenu({ onReserve, pricePerDay }) {
   const { id: boatId } = useParams();
   const location = useLocation();
 
@@ -52,7 +52,6 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) { // ✅ PA
   const handleDateChange = (item) => {
     let { startDate, endDate } = item.selection;
 
-    // ✅ PAKEISTA: užtikrinam mažiausiai 3 dienas
     if (differenceInCalendarDays(endDate, startDate) < 3) {
       endDate = addDays(startDate, 3);
     }
@@ -71,7 +70,7 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) { // ✅ PA
     });
   };
 
-  // ✅ PAKEISTA: suskaičiuojam dienų skaičių ir kainą
+ 
   const totalDays =
     range[0].startDate && range[0].endDate
       ? differenceInCalendarDays(range[0].endDate, range[0].startDate)
@@ -107,7 +106,7 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) { // ✅ PA
                 editableDateInputs
                 moveRangeOnFirstSelection={false}
                 ranges={range}
-                onChange={handleDateChange} // ✅ PAKEISTA: naudodam savo handler
+                onChange={handleDateChange}
                 minDate={addDays(new Date(), 1)}
                 rangeColors={["#0d6efd"]}
                 disabledDates={disabledDates}
@@ -125,7 +124,6 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) { // ✅ PA
         )}
       </div>
 
-      {/* ✅ PAKEISTA: rodome pasirinkimo suvestinę */}
       {totalDays > 0 && (
         <div className="text-center mb-3">
           <p className="mb-1">

@@ -10,8 +10,12 @@ export default function AdminUserList() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [userSearch, setUserSearch] = useState("");
-  const [sortField, setSortField] = useState("username");
+  const [nameSearch, setNameSearch] = useState("");
+  const [familyNameSearch, setFamilyNameSearch] = useState("");
+  const [usernameSearch, setUsernameSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+
+  const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
 
   // Pagination
@@ -27,9 +31,8 @@ export default function AdminUserList() {
         });
         if (!res.ok) throw new Error("Failed to fetch users");
         const data = await res.json();
-        
-        const usersArray = Array.isArray(data) ? data : data.users;
 
+        const usersArray = Array.isArray(data) ? data : data.users;
         setUsers(usersArray);
         setFilteredUsers(usersArray);
       } catch (err) {
@@ -46,23 +49,42 @@ export default function AdminUserList() {
 
   useEffect(() => {
     handleFilterAndSort();
-    setCurrentPage(1); // resetinam puslapį kai keičiasi filtrai
-  }, [userSearch, sortField, sortDirection, users]);
+    setCurrentPage(1);
+  }, [nameSearch, familyNameSearch, usernameSearch, roleFilter, sortField, sortDirection, users]);
 
   const handleFilterAndSort = () => {
     let filtered = [...users];
 
-    // Filtras pagal username
-    if (userSearch.trim() !== "") {
+    // Paieška pagal vardą
+    if (nameSearch.trim() !== "") {
       filtered = filtered.filter((u) =>
-        u.username.toLowerCase().includes(userSearch.toLowerCase())
+        u.name?.toLowerCase().includes(nameSearch.toLowerCase())
       );
     }
 
-    // Rūšiavimas
+    // Paieška pagal pavardę
+    if (familyNameSearch.trim() !== "") {
+      filtered = filtered.filter((u) =>
+        u.familyName?.toLowerCase().includes(familyNameSearch.toLowerCase())
+      );
+    }
+
+    // Paieška pagal username
+    if (usernameSearch.trim() !== "") {
+      filtered = filtered.filter((u) =>
+        u.username?.toLowerCase().includes(usernameSearch.toLowerCase())
+      );
+    }
+
+    // Filtras pagal rolę
+    if (roleFilter !== "all") {
+      filtered = filtered.filter((u) => u.role === roleFilter);
+    }
+
+    // Rūšiavimas pagal pasirinkta lauką
     filtered.sort((a, b) => {
-      const valA = a[sortField].toLowerCase();
-      const valB = b[sortField].toLowerCase();
+      const valA = (a[sortField] || "").toString().toLowerCase();
+      const valB = (b[sortField] || "").toString().toLowerCase();
       if (valA < valB) return sortDirection === "asc" ? -1 : 1;
       if (valA > valB) return sortDirection === "asc" ? 1 : -1;
       return 0;
@@ -97,7 +119,7 @@ export default function AdminUserList() {
 
   if (loading) return <p>Loading users...</p>;
 
-  // Pagination logic
+  // Pagination
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const paginatedUsers = filteredUsers.slice(
     (currentPage - 1) * itemsPerPage,
@@ -108,36 +130,59 @@ export default function AdminUserList() {
     <div className="container">
       <h2 className="my-3">Admin Users</h2>
 
-      {/* Search */}
-      <div className="mb-3">
+      {/* Search filters */}
+      <div className="d-flex flex-wrap gap-2 mb-3">
+        <input
+          type="text"
+          className="form-control w-auto"
+          placeholder="Search name..."
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+        />
+        <input
+          type="text"
+          className="form-control w-auto"
+          placeholder="Search family name..."
+          value={familyNameSearch}
+          onChange={(e) => setFamilyNameSearch(e.target.value)}
+        />
         <input
           type="text"
           className="form-control w-auto"
           placeholder="Search username..."
-          value={userSearch}
-          onChange={(e) => setUserSearch(e.target.value)}
+          value={usernameSearch}
+          onChange={(e) => setUsernameSearch(e.target.value)}
         />
+
+        <select
+          className="form-select w-auto"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
+          <option value="all">All roles</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
       </div>
 
       {/* Table */}
       <table className="table table-striped table-hover">
         <thead>
           <tr>
-            <th
-              onClick={() => handleSort("username")}
-              style={{ cursor: "pointer" }}
-            >
-              Username{" "}
-              {sortField === "username" &&
-                (sortDirection === "asc" ? "↑" : "↓")}
+            <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>
+              Name {sortField === "name" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
-            <th
-              onClick={() => handleSort("email")}
-              style={{ cursor: "pointer" }}
-            >
-              Email{" "}
-              {sortField === "email" && (sortDirection === "asc" ? "↑" : "↓")}
+            <th onClick={() => handleSort("familyName")} style={{ cursor: "pointer" }}>
+              Family Name{" "}
+              {sortField === "familyName" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
+            <th onClick={() => handleSort("country")} style={{ cursor: "pointer" }}>
+              Country{" "}
+              {sortField === "country" && (sortDirection === "asc" ? "↑" : "↓")}
+            </th>
+            <th>Phone</th>
+            <th>Username</th>
+            <th>Email</th>
             <th>Role</th>
             <th>Actions</th>
           </tr>
@@ -146,13 +191,15 @@ export default function AdminUserList() {
         <tbody>
           {paginatedUsers.map((u) => (
             <tr key={u._id}>
+              <td>{u.name}</td>
+              <td>{u.familyName}</td>
+              <td>{u.country}</td>
+              <td>{u.phone}</td>
               <td>{u.username}</td>
               <td>{u.email}</td>
               <td>
                 <span
-                  className={`badge ${
-                    u.role === "admin" ? "bg-danger" : "bg-secondary"
-                  }`}
+                  className={`badge ${u.role === "admin" ? "bg-danger" : "bg-secondary"}`}
                 >
                   {u.role}
                 </span>
@@ -198,25 +245,16 @@ export default function AdminUserList() {
                 key={i}
                 className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
               >
-                <button
-                  className="page-link"
-                  onClick={() => setCurrentPage(i + 1)}
-                >
+                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>
                   {i + 1}
                 </button>
               </li>
             ))}
 
-            <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
-            >
+            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
               <button
                 className="page-link"
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               >
                 &raquo;
               </button>
