@@ -11,6 +11,8 @@ const {
   getBoatByIdAdmin,
   getAllUsers,
   getUserById,
+  getAllReviews,
+  deleteReviewAdmin,
 } = require("../controllers/adminController");
 
 // USERS
@@ -30,5 +32,9 @@ router.get("/boats/:id", protect, admin, getBoatByIdAdmin);
 router.post("/boats", protect, admin, createBoat);
 router.put("/boats/:id", protect, admin, updateBoat);
 router.delete("/boats/:id", protect, admin, deleteBoat);
+
+// REVIEWS
+router.get("/reviews", protect, admin, getAllReviews);
+router.delete("/reviews/:id", protect, admin, deleteReviewAdmin);
 
 module.exports = router;

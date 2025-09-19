@@ -26,6 +26,9 @@ export default function AdminLayout() {
           <NavLink to="/admin/users" className="nav-link text-white">
             User Management
           </NavLink>
+          <NavLink to="/admin/reviews" className="nav-link text-white">
+            Reviews
+          </NavLink>
         </nav>
       </aside>
 

@@ -23,6 +23,7 @@ import AdminOrdersList from "./components/admin/AdminOrdersList";
 import AdminOrderDetails from "./components/admin/AdminOrderDetails";
 import AdminUserList from "./pages/Admin/AdminUserList";
 import AdminUserEdit from "./pages/Admin/AdminUserEdit";
+import AdminReviewList from "./pages/Admin/AdminReviewList";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,8 @@ const router = createBrowserRouter([
       { path: "reservations/:id", element: <AdminOrderDetails /> },
       { path: "users", element: <AdminUserList /> },
       { path: "users/:id", element: <AdminUserEdit /> },
+      { path: "reviews", element: <AdminReviewList /> },
+
     ],
   },
 ]);

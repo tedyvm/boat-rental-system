@@ -1,7 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const Boat = require("../models/Boat");
 const User = require("../models/User");
+const Review = require("../models/Review");
 const Reservation = require("../models/Reservation");
+const {recalcBoatRating} = require("./reviewController");
 
 //USERS
 
@@ -218,6 +220,43 @@ const getBoatByIdAdmin = asyncHandler(async (req, res) => {
   res.json(boat);
 });
 
+// Reviews
+
+const getAllReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({})
+    .populate("boat", "name")
+    .populate("user", "username email")
+    .sort({ createdAt: -1 });
+  res.json(reviews);
+});
+
+module.exports = {
+  getAllReviews,
+  // kiti controlleriai...
+};
+
+const deleteReviewAdmin = asyncHandler(async (req, res) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) {
+    res.status(404);
+    throw new Error("Review not found");
+  }
+
+  const boatId = review.boat ? review.boat.toString() : null;
+
+  await Review.findByIdAndDelete(req.params.id);
+
+  if (boatId) {
+    try {
+      await recalcBoatRating(boatId);
+    } catch (err) {
+      console.error("Failed to recalc rating:", err);
+    }
+  }
+
+  res.json({ message: "Review removed successfully" });
+});
+
 module.exports = {
   createBoat,
   getAllBoatsAdmin,
@@ -230,4 +269,6 @@ module.exports = {
   getAllReservations,
   updateReservationStatus,
   getBoatByIdAdmin,
+  getAllReviews,
+  deleteReviewAdmin,
 };
