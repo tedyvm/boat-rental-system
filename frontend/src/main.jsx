@@ -18,6 +18,7 @@ import AdminBoatDetails from "./pages/Admin/AdminBoatDetails";
 import AdminAddBoat from "./pages/Admin/AdminAddBoat";
 import MyOrders from "./pages/MyOrders";
 import ReservationDetails from "./pages/ReservationDetails";
+import ReservationEdit from "./pages/ReservationEdit";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { path: "/boats/:id", element: <BoatDetails /> },
       { path: "/reservations/me", element: <MyOrders /> },
       { path: "/reservations/:id", element: <ReservationDetails /> },
+      { path: "/reservations/:id/edit", element: <ReservationEdit /> },
     ],
   },
 

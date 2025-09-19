@@ -62,12 +62,12 @@ export default function ReservationDetails() {
 
   function handleEdit() {
     // Paprastas variantas – nukreipti į atskirą redagavimo puslapį
-    navigate(`/my-orders/${reservation._id}/edit`);
+    navigate(`/reservations/${reservation._id}/edit`);
   }
 
   return (
     <div className="container mt-4">
-      <button className="btn btn-link mb-3" onClick={() => navigate(-1)}>
+      <button className="btn btn-link mb-3" onClick={() => navigate("/reservations/me")}>
         ← Back
       </button>
       <h2>Reservation Details</h2>
