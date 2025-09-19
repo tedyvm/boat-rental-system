@@ -137,10 +137,10 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
               <option value="" disabled hidden>
                 Boat Type
               </option>
-              <option value="katamaranas">Catamaran</option>
-              <option value="jachta">Sailing Yacht</option>
-              <option value="motorinis">Motor Boat</option>
-              <option value="valtis">Small Boat</option>
+              <option value="Catamaran">Catamaran</option>
+              <option value="Sailing Yacht">Sailing Yacht</option>
+              <option value="Speed Boat">Speed Boat</option>
+              <option value="Small Boat">Small Boat</option>
             </select>
           </div>
         </div>

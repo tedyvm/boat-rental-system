@@ -122,4 +122,5 @@ module.exports = {
   getBoatReviews,
   getBoatAverageRating,
   deleteReview,
+  recalcBoatRating,
 };

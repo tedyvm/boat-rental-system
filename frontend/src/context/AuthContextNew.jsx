@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser(data.user);
     localStorage.setItem("user", JSON.stringify(data.user));
+    // NEBENAUDOJAME useNavigate ČIA
   };
 
   const logout = () => {
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // Čia irgi paliekam tik state reset
   };
 
   return (

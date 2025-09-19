@@ -7,7 +7,6 @@ import { createReservation } from "../utils/reservation";
 
 export default function BoatDetails() {
   const { id } = useParams();
-
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const startDate = searchParams.get("startDate");
@@ -19,7 +18,6 @@ export default function BoatDetails() {
   useEffect(() => {
     async function fetchBoat() {
       try {
-        console.log("🚀 Fetching boat:", id); // ✅ CHANGED (debug log)
         const res = await fetch(`http://localhost:5000/api/boats/${id}`);
         if (!res.ok) throw new Error("Boat not found");
         const data = await res.json();
@@ -34,7 +32,7 @@ export default function BoatDetails() {
   }, [id]);
 
   if (loading) return <p>Loading...</p>;
-  if (!boat) return <p>Boat not found.</p>;
+  if (!boat) return <p className="text-danger">Boat not found.</p>;
 
   const galleryItems = boat.images.map((img) => ({
     original: img,
@@ -42,7 +40,6 @@ export default function BoatDetails() {
   }));
 
   async function handleReserve({ startDate, endDate }) {
-    // ✅ CHANGED: vietoj tiesioginio fetch naudojam createReservation helperį
     try {
       const reservation = await createReservation({
         boatId: boat._id,
@@ -52,7 +49,6 @@ export default function BoatDetails() {
 
       alert("✅ Reservation created successfully!");
       console.log("📦 Reservation:", reservation);
-      // navigate("/my-reservations"); // jei reikia peradresuoti
     } catch (err) {
       alert(err.message);
       console.error("❌ Reservation error:", err);
@@ -62,16 +58,19 @@ export default function BoatDetails() {
   return (
     <div className="container mt-4">
       <div className="row">
-        <div className="col-md-3 d-12 order-2 order-md-1">
+        {/* Availability sidebar */}
+        <div className="col-md-3 order-2 order-md-1">
           <AvailabilityMenu
             pricePerDay={boat.pricePerDay}
             onReserve={handleReserve}
           />
         </div>
 
+        {/* Main boat info */}
         <div className="col-md-9 order-1 order-md-2">
-          <h2>{boat.name}</h2>
+          <h2 className="mb-3">{boat.name}</h2>
 
+          {/* Image gallery */}
           <div className="boat-gallery mb-4">
             <ImageGallery
               items={galleryItems}
@@ -81,28 +80,48 @@ export default function BoatDetails() {
             />
           </div>
 
-          <p>
-            <strong>Type: </strong>
-            {boat.type === "katamaranas"
-              ? "Catamaran"
-              : boat.type === "jachta"
-              ? "Sailing Yacht"
-              : boat.type === "motorinis"
-              ? "Motorboat"
-              : boat.type === "valtis"
-              ? "Small Boat"
-              : boat.type}
+          {/* Details card */}
+          <div className="card shadow-sm p-3 mb-4">
+            <div className="row">
+              <div className="col-md-6">
+                <p>
+                  <strong>Type:</strong> {boat.type}
+                </p>
+                <p>
+                  <strong>Location:</strong> {boat.location}
+                </p>
+                <p>
+                  <strong>Year:</strong> {boat.year}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <p>
+                  <strong>Capacity:</strong> 👥 {boat.capacity}
+                </p>
+                <p>
+                  <strong>Cabins:</strong> 🛏 {boat.cabins}
+                </p>
+                <p>
+                  <strong>Length:</strong> 📏 {boat.length} m
+                </p>
+                {boat.engine && (
+                  <p>
+                    <strong>Engine:</strong> ⚙ {boat.engine}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Price + description */}
+          <p className="fs-5 fw-bold text-primary">
+            Price: {boat.pricePerDay} €/day
           </p>
-          <p>
-            <strong>Capacity:</strong> {boat.capacity}
-          </p>
-          <p>
-            <strong>Cabins:</strong> {boat.cabins}
-          </p>
-          <p>
-            <strong>Price:</strong> {boat.pricePerDay} €/day
-          </p>
-          <p>{boat.description}</p>
+
+          <div className="mt-3">
+            <h4>Description</h4>
+            <p>{boat.description}</p>
+          </div>
         </div>
       </div>
     </div>

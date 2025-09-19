@@ -12,6 +12,13 @@ const createReservation = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Boat not found");
   }
+  // 2. Suskaičiuojam dienų skaičių
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+  // 3. Skaičiuojam totalPrice
+  const totalPrice = days * boat.pricePerDay;
 
   const reservation = await Reservation.create({
     user: req.user._id,
@@ -19,6 +26,7 @@ const createReservation = asyncHandler(async (req, res) => {
     startDate: new Date(startDate),
     endDate: new Date(endDate),
     note,
+    totalPrice,
     status: "pending",
   });
 
@@ -58,7 +66,9 @@ const getReservationById = asyncHandler(async (req, res) => {
 
 // PUT /api/reservations/:id – update dates (only if pending)
 const updateReservation = asyncHandler(async (req, res) => {
-  const reservation = await Reservation.findById(req.params.id);
+  const reservation = await Reservation.findById(req.params.id).populate(
+    "boat"
+  );
   if (!reservation) {
     res.status(404);
     throw new Error("Reservation not found");
@@ -77,9 +87,18 @@ const updateReservation = asyncHandler(async (req, res) => {
     throw new Error("Only pending reservations can be updated");
   }
 
-  // startDate/endDate jau validuoti middleware
+  // atnaujinam datas
   if (req.body.startDate) reservation.startDate = new Date(req.body.startDate);
   if (req.body.endDate) reservation.endDate = new Date(req.body.endDate);
+
+  // jei pasikeitė datos → perskaičiuojam kainą
+  if (req.body.startDate || req.body.endDate) {
+    const start = new Date(reservation.startDate);
+    const end = new Date(reservation.endDate);
+
+    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    reservation.totalPrice = days * reservation.boat.pricePerDay;
+  }
 
   await reservation.save();
   res.json(reservation);

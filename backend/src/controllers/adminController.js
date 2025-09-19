@@ -1,9 +1,39 @@
 const asyncHandler = require("express-async-handler");
 const Boat = require("../models/Boat");
 const User = require("../models/User");
+const Review = require("../models/Review");
 const Reservation = require("../models/Reservation");
+const { recalcBoatRating } = require("./reviewController");
 
 //USERS
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const count = await User.countDocuments({});
+  const users = await User.find({})
+    .select("-password")
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.json({
+    users,
+    page,
+    pages: Math.ceil(count / limit),
+  });
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  res.json(user);
+});
+
 const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) {
@@ -39,36 +69,22 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // BOATS
 const createBoat = asyncHandler(async (req, res) => {
-  const {
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status,
-  } = req.body;
 
-  const boatExists = await Boat.findOne({ name });
+  const boatExists = await Boat.findOne({ name: req.body.name });
   if (boatExists) {
     res.status(400);
     throw new Error("Boat already exists");
   }
 
-  const boat = await Boat.create({
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status: status || "draft",
-  });
-
-  res.status(201).json(boat);
+  try {
+    const boat = await Boat.create(req.body);
+    res.status(201).json(boat);
+  } catch (err) {
+    console.error("❌ Failed to create boat:", err);
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
   const { search, type, status, sort, page = 1, limit = 10 } = req.query;
@@ -110,29 +126,17 @@ const updateBoat = asyncHandler(async (req, res) => {
     throw new Error("Boat not found");
   }
 
-  const {
-    type,
-    name,
-    description,
-    pricePerDay,
-    capacity,
-    withCaptain,
-    images,
-    status,
-  } = req.body;
+  Object.assign(boat, req.body); // perrašo laukus, kuriuos atsiuntė klientas
 
-  boat.type = type || boat.type;
-  boat.name = name || boat.name;
-  boat.description = description || boat.description;
-  boat.pricePerDay = pricePerDay || boat.pricePerDay;
-  boat.capacity = capacity || boat.capacity;
-  boat.withCaptain = withCaptain !== undefined ? withCaptain : boat.withCaptain;
-  boat.images = images || boat.images;
-  boat.status = status || boat.status;
-
-  const updatedBoat = await boat.save();
-  res.json(updatedBoat);
+  try {
+    const updatedBoat = await boat.save();
+    res.json(updatedBoat);
+  } catch (err) {
+    console.error("❌ Failed to update boat:", err);
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 const deleteBoat = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
@@ -180,6 +184,26 @@ const updateReservationStatus = asyncHandler(async (req, res) => {
   await reservation.save();
   res.json(reservation);
 });
+
+const deleteReservation = asyncHandler(async (req, res) => {
+  const reservation = await Reservation.findById(req.params.id);
+  if (!reservation) {
+    res.status(404);
+    throw new Error("Reservation not found");
+  }
+
+  // Leidžiame trinti tik completed, cancelled arba rejected
+  if (!["completed", "cancelled", "rejected"].includes(reservation.status)) {
+    res.status(400);
+    throw new Error(
+      "Only completed, cancelled or rejected reservations can be deleted"
+    );
+  }
+
+  await reservation.deleteOne();
+  res.json({ message: "Reservation deleted successfully" });
+});
+
 const getBoatByIdAdmin = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
   if (!boat) {
@@ -189,14 +213,56 @@ const getBoatByIdAdmin = asyncHandler(async (req, res) => {
   res.json(boat);
 });
 
+// Reviews
+
+const getAllReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({})
+    .populate("boat", "name")
+    .populate("user", "username email")
+    .sort({ createdAt: -1 });
+  res.json(reviews);
+});
+
+module.exports = {
+  getAllReviews,
+  // kiti controlleriai...
+};
+
+const deleteReviewAdmin = asyncHandler(async (req, res) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) {
+    res.status(404);
+    throw new Error("Review not found");
+  }
+
+  const boatId = review.boat ? review.boat.toString() : null;
+
+  await Review.findByIdAndDelete(req.params.id);
+
+  if (boatId) {
+    try {
+      await recalcBoatRating(boatId);
+    } catch (err) {
+      console.error("Failed to recalc rating:", err);
+    }
+  }
+
+  res.json({ message: "Review removed successfully" });
+});
+
 module.exports = {
   createBoat,
   getAllBoatsAdmin,
   updateBoat,
   deleteBoat,
   updateUser,
+  getAllUsers,
+  getUserById,
   deleteUser,
   getAllReservations,
   updateReservationStatus,
   getBoatByIdAdmin,
+  getAllReviews,
+  deleteReviewAdmin,
+  deleteReservation,
 };

@@ -73,7 +73,8 @@ export default function AdminBoatDetails() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(boat),
       });
       if (!res.ok) throw new Error("Failed to update boat");
@@ -109,7 +110,6 @@ export default function AdminBoatDetails() {
     <div className="container">
       <h2 className="my-3">Edit Boat</h2>
 
-      {/* react-image-gallery */}
       {boat.images.length > 0 ? (
         <ImageGallery
           items={galleryItems}
@@ -122,6 +122,7 @@ export default function AdminBoatDetails() {
       )}
 
       <form onSubmit={handleSubmit}>
+        {/* Image uploader */}
         <div className="mb-3">
           <label className="form-label">Add Images</label>
           <input
@@ -133,8 +134,7 @@ export default function AdminBoatDetails() {
           />
         </div>
 
-        {/* Kiti formos laukai (name, type, description...) */}
-
+        {/* Main fields */}
         <div className="mb-3">
           <label className="form-label">Name</label>
           <input
@@ -154,10 +154,72 @@ export default function AdminBoatDetails() {
             value={boat.type}
             onChange={handleChange}
           >
-            <option value="yacht">Yacht</option>
-            <option value="motor">Motor Boat</option>
-            <option value="sailboat">Sailboat</option>
+            <option value="Catamaran">Catamaran</option>
+            <option value="Sailing Yacht">Sailing Yacht</option>
+            <option value="Speed Boat">Speed Boat</option>
+            <option value="Small Boat">Small Boat</option>
           </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Location</label>
+          <input
+            type="text"
+            name="location"
+            className="form-control"
+            value={boat.location || ""}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Specs */}
+        <div className="row">
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Year</label>
+            <input
+              type="number"
+              name="year"
+              className="form-control"
+              value={boat.year}
+              min="1980"
+              max={new Date().getFullYear()}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Length (m)</label>
+            <input
+              type="number"
+              step="0.1"
+              name="length"
+              className="form-control"
+              value={boat.length}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label className="form-label">Cabins</label>
+            <input
+              type="number"
+              name="cabins"
+              className="form-control"
+              value={boat.cabins}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Engine</label>
+          <input
+            type="text"
+            name="engine"
+            className="form-control"
+            value={boat.engine}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
@@ -171,8 +233,9 @@ export default function AdminBoatDetails() {
           />
         </div>
 
+        {/* Pricing & status */}
         <div className="mb-3">
-          <label className="form-label">Price Per Day</label>
+          <label className="form-label">Price Per Day (€)</label>
           <input
             type="number"
             name="pricePerDay"

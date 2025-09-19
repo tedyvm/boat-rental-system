@@ -13,17 +13,23 @@ export default function BoatFilters({
   maxCapacity = 20,
 }) {
   const today = new Date();
+  const currentYear = today.getFullYear();
   const minStart = addDays(today, 3);
   const calendarRef = useRef(null);
 
   const [showCalendar, setShowCalendar] = useState(false);
 
   const [filters, setFilters] = useState({
-    type: initialValues.type || "",
     priceMin: Number(initialValues.priceMin) || 0,
     priceMax: Number(initialValues.priceMax) || maxPrice,
     withCaptain: initialValues.withCaptain || "",
     capacityMin: Number(initialValues.capacityMin) || 0,
+    yearRange: [
+      Number(initialValues.yearMin) || 1980,
+      Number(initialValues.yearMax) || currentYear,
+    ],
+    cabinsMin: Number(initialValues.cabinsMin) || 0,
+    lengthMin: Number(initialValues.lengthMin) || 3,
     startDate: initialValues.startDate
       ? new Date(initialValues.startDate)
       : minStart,
@@ -32,7 +38,7 @@ export default function BoatFilters({
       : addDays(minStart, 3),
   });
 
-  // Uždarom popup paspaudus už ribų
+  // uždarom kalendorių paspaudus už ribų
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -42,12 +48,9 @@ export default function BoatFilters({
     if (showCalendar) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showCalendar]);
 
-  // kai pasikeičia maxPrice/maxCapacity (pvz. filtruotas sąrašas sumažėjo)
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
@@ -57,15 +60,23 @@ export default function BoatFilters({
     }));
   }, [maxPrice, maxCapacity]);
 
-  // pranešame tėviniam komponentui apie pokyčius
   useEffect(() => {
     const cleaned = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v !== "" && v != null)
     );
+
     if (cleaned.startDate)
       cleaned.startDate = format(cleaned.startDate, "yyyy-MM-dd");
     if (cleaned.endDate)
       cleaned.endDate = format(cleaned.endDate, "yyyy-MM-dd");
+
+    // išskiriam yearRange į atskirus laukus
+    if (Array.isArray(cleaned.yearRange)) {
+      cleaned.yearMin = cleaned.yearRange[0];
+      cleaned.yearMax = cleaned.yearRange[1];
+      delete cleaned.yearRange;
+    }
+
     onChange(cleaned);
   }, [filters]);
 
@@ -74,14 +85,10 @@ export default function BoatFilters({
     if (differenceInCalendarDays(endDate, startDate) < 3) {
       endDate = addDays(startDate, 3);
     }
-    setFilters((prev) => ({
-      ...prev,
-      startDate,
-      endDate,
-    }));
+    setFilters((prev) => ({ ...prev, startDate, endDate }));
   };
 
-  const formatDate = (date) => date.toISOString().slice(0, 10); // yyyy-mm-dd
+  const formatDate = (date) => date.toISOString().slice(0, 10);
 
   return (
     <div className="p-3 border rounded bg-light">
@@ -140,25 +147,50 @@ export default function BoatFilters({
         )}
       </div>
 
-      {/* Tipas */}
-      <div className="mb-3 d-block d-md-none">
-        <label className="form-label">Laivo tipas</label>
-        <select
-          value={filters.type}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, type: e.target.value }))
+      {/* Year range slider */}
+      <div className="mb-3">
+        <label className="form-label d-flex justify-content-between">
+          <span>Year</span>
+          <span>
+            {filters.yearRange[0]} – {filters.yearRange[1]}
+          </span>
+        </label>
+        <Slider
+          range
+          min={1980}
+          max={currentYear}
+          value={filters.yearRange}
+          onChange={(val) =>
+            setFilters((prev) => ({ ...prev, yearRange: val }))
           }
-          className="form-select"
-        >
-          <option value="">All</option>
-          <option value="katamaranas">Catamaran</option>
-          <option value="jachta">Yacht</option>
-          <option value="motorinis">Speed Boat</option>
-          <option value="valtis">Small boat</option>
-        </select>
+          trackStyle={[{ backgroundColor: "#45CAD1" }]}
+          handleStyle={[
+            { borderColor: "#45CAD1", backgroundColor: "#45CAD1" },
+            { borderColor: "#45CAD1", backgroundColor: "#45CAD1" },
+          ]}
+        />
       </div>
 
-      {/* Kainų diapazonas (slider) */}
+      {/* Length slider */}
+      <div className="mb-3">
+        <label className="form-label d-flex justify-content-between">
+          <span>Length (m)</span>
+          <span>{filters.lengthMin}+</span>
+        </label>
+        <Slider
+          min={3}
+          max={25}
+          step={0.5}
+          value={filters.lengthMin}
+          onChange={(val) =>
+            setFilters((prev) => ({ ...prev, lengthMin: val }))
+          }
+          trackStyle={[{ backgroundColor: "#45CAD1" }]}
+          handleStyle={[{ borderColor: "#45CAD1", backgroundColor: "#45CAD1" }]}
+        />
+      </div>
+
+      {/* Price slider */}
       <div className="mb-3">
         <label className="form-label d-flex justify-content-between">
           <span>Price per day (€)</span>
@@ -188,7 +220,7 @@ export default function BoatFilters({
       </div>
 
       {/* Kapitonas */}
-      <div className="form-check mb-3 d-block d-md-none">
+      <div className="form-check mb-3">
         <input
           className="form-check-input"
           type="checkbox"
@@ -200,10 +232,10 @@ export default function BoatFilters({
             }))
           }
         />
-        <label className="form-check-label">Tik su kapitonu</label>
+        <label className="form-check-label">With captain only</label>
       </div>
 
-      {/* Min. vietų (slider) */}
+      {/* Capacity slider */}
       <div className="mb-3">
         <label className="form-label d-flex justify-content-between">
           <span>Max people</span>
@@ -215,6 +247,24 @@ export default function BoatFilters({
           value={filters.capacityMin}
           onChange={(val) =>
             setFilters((prev) => ({ ...prev, capacityMin: val }))
+          }
+          trackStyle={[{ backgroundColor: "#45CAD1" }]}
+          handleStyle={[{ borderColor: "#45CAD1", backgroundColor: "#45CAD1" }]}
+        />
+      </div>
+
+      {/* Cabins slider */}
+      <div className="mb-3">
+        <label className="form-label d-flex justify-content-between">
+          <span>Min cabins</span>
+          <span>{filters.cabinsMin}+</span>
+        </label>
+        <Slider
+          min={0}
+          max={10}
+          value={filters.cabinsMin}
+          onChange={(val) =>
+            setFilters((prev) => ({ ...prev, cabinsMin: val }))
           }
           trackStyle={[{ backgroundColor: "#45CAD1" }]}
           handleStyle={[{ borderColor: "#45CAD1", backgroundColor: "#45CAD1" }]}

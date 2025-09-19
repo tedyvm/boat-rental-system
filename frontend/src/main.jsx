@@ -16,12 +16,14 @@ import { AuthProvider } from "./context/AuthContext";
 import AdminBoatList from "./pages/Admin/AdminBoatList";
 import AdminBoatDetails from "./pages/Admin/AdminBoatDetails";
 import AdminAddBoat from "./pages/Admin/AdminAddBoat";
-// Admin pages
-// import AdminBoatList from "./pages/admin/BoatList";
-// import AdminBoatDetails from "./pages/admin/BoatDetails";
-// import AddBoat from "./pages/admin/AddBoat";
-// import Orders from "./pages/admin/Orders";
-// import Users from "./pages/admin/Users";
+import MyOrders from "./pages/MyOrders";
+import ReservationDetails from "./pages/ReservationDetails";
+import ReservationEdit from "./pages/ReservationEdit";
+import AdminOrdersList from "./components/admin/AdminOrdersList";
+import AdminOrderDetails from "./components/admin/AdminOrderDetails";
+import AdminUserList from "./pages/Admin/AdminUserList";
+import AdminUserEdit from "./pages/Admin/AdminUserEdit";
+import AdminReviewList from "./pages/Admin/AdminReviewList";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,9 @@ const router = createBrowserRouter([
       { path: "/register", element: <Register /> },
       { path: "/boats", element: <Boats /> },
       { path: "/boats/:id", element: <BoatDetails /> },
+      { path: "/reservations/me", element: <MyOrders /> },
+      { path: "/reservations/:id", element: <ReservationDetails /> },
+      { path: "/reservations/:id/edit", element: <ReservationEdit /> },
     ],
   },
 
@@ -44,8 +49,12 @@ const router = createBrowserRouter([
       { path: "boats", element: <AdminBoatList /> },
       { path: "boats/new", element: <AdminAddBoat /> },
       { path: "boats/:id", element: <AdminBoatDetails /> },
-      // { path: "orders", element: <Orders isAdminView={true} /> },
-      // { path: "users", element: <Users isAdminView={true} /> },
+      { path: "reservations", element: <AdminOrdersList /> },
+      { path: "reservations/:id", element: <AdminOrderDetails /> },
+      { path: "users", element: <AdminUserList /> },
+      { path: "users/:id", element: <AdminUserEdit /> },
+      { path: "reviews", element: <AdminReviewList /> },
+
     ],
   },
 ]);

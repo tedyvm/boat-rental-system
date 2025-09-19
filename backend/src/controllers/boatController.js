@@ -31,7 +31,7 @@ const searchBoats = asyncHandler(async (req, res) => {
     sort,
   } = req.query;
 
-  let filter = {status: "published"};
+  let filter = { status: "published" };
 
   if (type) filter.type = type;
   if (priceMin || priceMax) filter.pricePerDay = {};
@@ -61,9 +61,9 @@ const searchBoats = asyncHandler(async (req, res) => {
       boats.map(async (boat) => {
         const conflict = await Reservation.findOne({
           boat: boat._id,
-          $or: [
-            { startDate: { $lte: eDate }, endDate: { $gte: sDate } }, // uždengia intervalą
-          ],
+          status: { $in: ["pending", "approved", "active"] }, // ✅ TIK aktyvios
+          startDate: { $lte: eDate },
+          endDate: { $gte: sDate },
         });
         return conflict ? null : boat;
       })
@@ -83,8 +83,11 @@ const getBookedDates = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Boat not found" });
   }
 
-  // Ištraukiam visas rezervacijas šiam laivui
-  const reservations = await Reservation.find({ boat: id });
+  // Filtruojam rezervacijas tik su aktyviais statusais
+  const reservations = await Reservation.find({
+    boat: id,
+    status: { $in: ["pending", "approved", "active"] }, // ✅ rodom tik aktyvias/patvirtintas
+  });
 
   // Grąžinam tik datas (start + end)
   const bookedDates = reservations.map((r) => ({
