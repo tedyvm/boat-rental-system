@@ -204,6 +204,21 @@ export default function AdminBoatList() {
               Cabins{" "}
               {sortField === "cabins" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
+            <th
+              style={{ cursor: "pointer" }}
+              onClick={() => handleSort("rating")}
+            >
+              Rating{" "}
+              {sortField === "rating" && (sortDirection === "asc" ? "↑" : "↓")}
+            </th>
+            <th
+              style={{ cursor: "pointer" }}
+              onClick={() => handleSort("numberOfReviews")}
+            >
+              Reviews{" "}
+              {sortField === "numberOfReviews" &&
+                (sortDirection === "asc" ? "↑" : "↓")}
+            </th>
             <th>Status</th>
             <th
               style={{ cursor: "pointer" }}
@@ -233,6 +248,8 @@ export default function AdminBoatList() {
               <td>{boat.year}</td>
               <td>{boat.length} m</td>
               <td>{boat.cabins}</td>
+              <td>{boat.rating}</td>
+              <td>{boat.numberOfReviews}</td>
               <td>
                 <span
                   className={`badge ${

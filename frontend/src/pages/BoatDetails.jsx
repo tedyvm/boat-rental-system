@@ -4,6 +4,8 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import AvailabilityMenu from "../components/AvailabilityMenu";
 import { createReservation } from "../utils/reservation";
+import StarRating from "../components/StarRating";
+import ReviewList from "../components/ReviewList";
 
 export default function BoatDetails() {
   const { id } = useParams();
@@ -121,6 +123,20 @@ export default function BoatDetails() {
           <div className="mt-3">
             <h4>Description</h4>
             <p>{boat.description}</p>
+          </div>
+          <div className="mt-4">
+            <h4 className="mb-2">Reviews</h4>
+
+            {/* Žvaigždutės + bendras vidurkis */}
+            <div className="d-flex align-items-center mb-3">
+              <StarRating rating={boat.rating} size={24} />
+              <span className="ms-2 text-muted">
+                {boat.rating.toFixed(1)} / 5 ({boat.numberOfReviews} reviews)
+              </span>
+            </div>
+
+            {/* Review sąrašas */}
+            <ReviewList boatId={boat._id} />
           </div>
         </div>
       </div>

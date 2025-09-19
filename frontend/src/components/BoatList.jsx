@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "../styles/BoatList.css";
+import StarRating from "../components/StarRating";
+
 
 export default function BoatList({ boats, currentSort, onSortChange }) {
   const location = useLocation();
@@ -112,10 +114,21 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
                 />
               )}
               <div className="card-body d-flex flex-column">
-                <h5 className="card-title">{boat.name}</h5>
-                
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h2 className="mb-0">{boat.name}</h2>
+
+                  <div className="text-end">
+                    <StarRating rating={boat.rating} size={22} />
+                    <small className="text-muted ms-2">
+                      ({boat.numberOfReviews} reviews)
+                    </small>
+                  </div>
+                </div>
+
                 {/* TYPE iš modelio */}
-                <p className="card-text">{boat.type}</p>
+                <p className="card-text">
+                  {boat.type} | {boat.rating}
+                </p>
 
                 {/* Nauji laukai */}
                 <p className="card-text">
@@ -127,9 +140,7 @@ export default function BoatList({ boats, currentSort, onSortChange }) {
                   👥 x {boat.capacity} | 🛏 x {boat.cabins} | 📏 {boat.length} m
                 </p>
 
-                <p className="fw-bold ms-auto">
-                  From {boat.pricePerDay} €/day
-                </p>
+                <p className="fw-bold ms-auto">From {boat.pricePerDay} €/day</p>
 
                 <a
                   href={`/boats/${boat._id}${location.search}`}

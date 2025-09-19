@@ -21,6 +21,8 @@ const boatSchema = new mongoose.Schema(
 
     description: { type: String, required: true },
     images: [String],
+    rating: { type: Number, default: 0 },
+    numberOfReviews: { type: Number, default: 0 },
     isAvailable: { type: Boolean, default: true },
   },
   { timestamps: true }
