@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { DateRange } from "react-date-range";
-import { addDays, format, eachDayOfInterval, differenceInCalendarDays } from "date-fns";
+import {
+  addDays,
+  format,
+  eachDayOfInterval,
+  differenceInCalendarDays,
+} from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../styles/Availability.css";
@@ -11,16 +16,23 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
   const location = useLocation();
 
   const searchParams = new URLSearchParams(location.search);
+
+  const today = new Date();
   const initialStart = searchParams.get("startDate")
     ? new Date(searchParams.get("startDate"))
-    : null;
+    : today;
   const initialEnd = searchParams.get("endDate")
     ? new Date(searchParams.get("endDate"))
-    : null;
+    : today;
 
   const [range, setRange] = useState([
-    { startDate: initialStart, endDate: initialEnd, key: "selection" },
+    {
+      startDate: initialStart || undefined,
+      endDate: initialEnd || undefined,
+      key: "selection",
+    },
   ]);
+
   const [showCalendar, setShowCalendar] = useState(false);
   const [disabledDates, setDisabledDates] = useState([]);
 
@@ -51,11 +63,6 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
 
   const handleDateChange = (item) => {
     let { startDate, endDate } = item.selection;
-
-    if (differenceInCalendarDays(endDate, startDate) < 3) {
-      endDate = addDays(startDate, 3);
-    }
-
     setRange([{ startDate, endDate, key: "selection" }]);
   };
 
@@ -70,7 +77,6 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
     });
   };
 
- 
   const totalDays =
     range[0].startDate && range[0].endDate
       ? differenceInCalendarDays(range[0].endDate, range[0].startDate)
@@ -105,12 +111,14 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
               <DateRange
                 editableDateInputs
                 moveRangeOnFirstSelection={false}
+                retainEndDateOnFirstSelection={true}
                 ranges={range}
                 onChange={handleDateChange}
                 minDate={addDays(new Date(), 1)}
                 rangeColors={["#0d6efd"]}
                 disabledDates={disabledDates}
               />
+
               <div className="text-end mt-2">
                 <button
                   className="button"
