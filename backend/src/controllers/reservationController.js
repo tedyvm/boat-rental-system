@@ -125,10 +125,27 @@ const cancelReservation = asyncHandler(async (req, res) => {
   res.json({ message: "Reservation cancelled" });
 });
 
+//PAYMENT route for TEST
+const paymentSuccess = asyncHandler(async (req, res) => {
+  const newStatus = "approved";
+  const allowed = ["approved", "rejected", "active", "completed", "cancelled"];
+
+  const reservation = await Reservation.findById(req.params.id);
+  if (!reservation) {
+    res.status(404);
+    throw new Error("Reservation not found");
+  }
+
+  reservation.status = newStatus;
+  await reservation.save();
+  res.json(reservation);
+});
+
 module.exports = {
   createReservation,
   getMyReservations,
   getReservationById,
   updateReservation,
   cancelReservation,
+  paymentSuccess,
 };

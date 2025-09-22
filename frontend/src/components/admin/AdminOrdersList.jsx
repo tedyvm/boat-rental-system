@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminOrdersList() {
+  const today = new Date();
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -10,7 +11,7 @@ export default function AdminOrdersList() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [boatSearch, setBoatSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
 
@@ -44,7 +45,7 @@ export default function AdminOrdersList() {
   useEffect(() => {
     handleFilterAndSort();
   }, [
-    selectedStatus,
+    selectedStatuses,
     boatSearch,
     userSearch,
     sortField,
@@ -56,8 +57,8 @@ export default function AdminOrdersList() {
     let filtered = [...orders];
 
     // Filtras pagal statusą
-    if (selectedStatus !== "all") {
-      filtered = filtered.filter((o) => o.status === selectedStatus);
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter((o) => selectedStatuses.includes(o.status));
     }
 
     // Filtras pagal boat name
@@ -112,21 +113,63 @@ export default function AdminOrdersList() {
       <h2 className="my-3">Admin Orders</h2>
 
       {/* Filters row */}
-      <div className="d-flex flex-wrap gap-2 mb-3">
-        {/* Status filter */}
-        <select
-          className="form-select w-auto"
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+      <div className="row d-flex flex-wrap gap-2 mb-3">
+        <div className="d-flex flex-wrap gap-2">
+          {[
+            "pending",
+            "approved",
+            "rejected",
+            "active",
+            "completed",
+            "cancelled",
+          ].map((status) => (
+            <div key={status} className="form-check form-check-inline">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`status-${status}`}
+                checked={selectedStatuses.includes(status)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedStatuses((prev) => [...prev, status]);
+                  } else {
+                    setSelectedStatuses((prev) =>
+                      prev.filter((s) => s !== status)
+                    );
+                  }
+                }}
+              />
+              <label className="form-check-label" htmlFor={`status-${status}`}>
+                {status}
+              </label>
+            </div>
+          ))}
+          <div className="d-flex gap-2">
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() =>
+                setSelectedStatuses([
+                  "pending",
+                  "approved",
+                  "rejected",
+                  "active",
+                  "completed",
+                  "cancelled",
+                ])
+              }
+            >
+              Select All
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => setSelectedStatuses([])}
+            >
+              Clear
+            </button>
+          </div>
+        </div>
 
         {/* Boat name search */}
         <input
@@ -180,6 +223,14 @@ export default function AdminOrdersList() {
               End Date{" "}
               {sortField === "endDate" && (sortDirection === "asc" ? "↑" : "↓")}
             </th>
+            <th
+              onClick={() => handleSort("createdAt")}
+              style={{ cursor: "pointer" }}
+            >
+              Created At{" "}
+              {sortField === "createdAt" &&
+                (sortDirection === "asc" ? "↑" : "↓")}
+            </th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -196,6 +247,7 @@ export default function AdminOrdersList() {
               <td>{o.user?.username || "Deleted user"}</td>
               <td>{new Date(o.startDate).toLocaleDateString()}</td>
               <td>{new Date(o.endDate).toLocaleDateString()}</td>
+              <td>{new Date(o.createdAt).toLocaleDateString()}</td>
               <td>
                 <span
                   className={`badge ${
@@ -207,8 +259,24 @@ export default function AdminOrdersList() {
                   }`}
                 >
                   {o.status}
+                  {o.status === "pending" &&
+                    (() => {
+                      const created = new Date(o.createdAt);
+                      const diffMs = today - created; // ms nuo sukurimo
+                      const daysPassed = Math.floor(
+                        diffMs / (1000 * 60 * 60 * 24)
+                      );
+                      const daysLeft = 3 - daysPassed;
+
+                      return (
+                        <div style={{ fontSize: "0.8em" }}>
+                          left {daysLeft > 0 ? daysLeft : 0}d
+                        </div>
+                      );
+                    })()}
                 </span>
               </td>
+
               <td>
                 <button
                   className="btn btn-sm btn-primary me-2"

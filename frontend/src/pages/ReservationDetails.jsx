@@ -144,6 +144,21 @@ export default function ReservationDetails() {
     }
   }
 
+  function handlePayment() {
+    try {
+      // Simulate payment success
+      fetch(`http://localhost:5000/api/reservations/${reservation._id}/payment-success`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
+    }
+    alert("Payment successful! Reservation is now approved.");
+    setReservation((prev) => ({ ...prev, status: "approved" }));
+  }
+
   if (loading) return <p>Loading reservation...</p>;
   if (!reservation) return <p className="text-danger">Reservation not found</p>;
 
@@ -193,13 +208,25 @@ export default function ReservationDetails() {
         )}
 
         {reservation.status === "pending" && (
-          <div className="mt-3 d-flex gap-2">
-            <button className="btn btn-warning" onClick={handleEdit}>
-              Edit Reservation
-            </button>
-            <button className="btn btn-danger" onClick={handleCancel}>
-              Cancel Reservation
-            </button>
+          <div>
+            <div className="mt-3 d-flex gap-2">
+              <p>
+                <strong>
+                  Your reservation is confirmed, but it will not become approved
+                  until payment is completed. If payment is not made within 3
+                  days, the reservation will be automatically canceled.
+                </strong>
+              </p>
+            </div>
+            <div className="mt-3 d-flex gap-2">
+              <button className="btn btn-warning" onClick={handleEdit}>
+                Edit Reservation
+              </button>
+              <button className="btn btn-danger" onClick={handleCancel}>
+                Cancel Reservation
+              </button>
+              <button className="btn btn-success" onClick={handlePayment}>Make Payment</button>
+            </div>
           </div>
         )}
       </div>
