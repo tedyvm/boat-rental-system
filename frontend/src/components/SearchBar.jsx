@@ -117,14 +117,8 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!dateRange[0].startDate || !dateRange[0].endDate) {
-      alert("Please select a start and end date.");
-      return;
-    }
-
     const params = buildParams();
-    navigate(`/boats?${params.toString()}`);
+    navigate(`/boats?${params.toString()}`, { replace: true });
   };
 
   useEffect(() => {

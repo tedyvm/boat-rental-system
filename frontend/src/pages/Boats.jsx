@@ -26,14 +26,14 @@ export default function Boats({ isAdminView = false }) {
   const handleFiltersChange = (filters) => {
     const params = new URLSearchParams(filters);
     if (currentSort) params.set("sort", currentSort);
-    navigate(`/boats?${params.toString()}`);
+    navigate(`/boats?${params.toString()}`, { replace: true });
   };
 
   const handleSortChange = (sortOption) => {
     const params = new URLSearchParams(location.search);
     if (sortOption) params.set("sort", sortOption);
     else params.delete("sort");
-    navigate(`/boats?${params.toString()}`);
+    navigate(`/boats?${params.toString()}`, { replace: true });
   };
 
   useEffect(() => {

@@ -6,13 +6,10 @@ import AvailabilityMenu from "../components/AvailabilityMenu";
 import { createReservation } from "../utils/reservation";
 import StarRating from "../components/StarRating";
 import ReviewList from "../components/ReviewList";
+import "../styles/BoatDetails.css";
 
 export default function BoatDetails() {
   const { id } = useParams();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const startDate = searchParams.get("startDate");
-  const endDate = searchParams.get("endDate");
 
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +58,7 @@ export default function BoatDetails() {
     <div className="container mt-4">
       <div className="row">
         {/* Availability sidebar */}
-        <div className="col-md-3 order-2 order-md-1">
+        <div className="col-md-3 order-2 order-md-1 availability-sidebar">
           <AvailabilityMenu
             pricePerDay={boat.pricePerDay}
             onReserve={handleReserve}

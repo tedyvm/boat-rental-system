@@ -52,15 +52,33 @@ p {
   background-size: cover;
   background-position: center;
   height: 335px;
+  cursor: pointer;
 }
-
-/* S1 */
 
 .s1c2 {
   background-image: url("/images/s1c2_bg.png");
   background-size: cover;
   background-position: center;
   height: 335px;
+  cursor: pointer;
+}
+
+.s1c1,
+.s1c2 {
+  background-size: cover;
+  background-position: center;
+  height: 335px;
+  cursor: pointer;
+
+  /* 🔑 Kad transform veiktų gražiai */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.s1c1:hover,
+.s1c2:hover {
+  transform: scale(1.03); /* švelniai padidinam */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* subtilus šešėlis */
 }
 
 .s1c1 h3,
@@ -124,7 +142,7 @@ p {
 
 .s3 button {
   color: white;
-  background-color: #45CAD1;
+  background-color: #45cad1;
   border: none;
   border-radius: 99px;
   color: white;
