@@ -68,11 +68,15 @@ export default function AdminOrderDetails() {
     <div className="container mt-4">
       <h2>Order Details</h2>
       <div className="card p-3 shadow-sm">
-        <p><strong>Boat:</strong> {order.boat?.name}</p>
-        <p><strong>User:</strong> {order.user?.username}</p>
+        <p onClick={() => navigate(`/admin/boats/${order.boat?._id}`)} style={{ cursor: "pointer" }}><strong>Boat:</strong> {order.boat?.name}</p>
+        <p onClick={() => navigate(`/admin/users/${order.user?._id}`)} style={{ cursor: "pointer" }}><strong>User:</strong> {order.user?.username}</p>
         <p><strong>Start Date:</strong> {new Date(order.startDate).toLocaleDateString()}</p>
         <p><strong>End Date:</strong> {new Date(order.endDate).toLocaleDateString()}</p>
         <p><strong>Current Status:</strong> {order.status}</p>
+        <p><strong>Total Price:</strong> ${order.totalPrice?.toFixed(2)}</p>
+        <p><strong>Payment Status:</strong> {order.isPaid ? "Paid" : "Not Paid"}</p>
+        <p><strong>Created At:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+        <p><strong>Comments:</strong> {order.comments || "No comments"}</p>
 
         <div className="mb-3">
           <label className="form-label fw-bold">Change Status</label>
@@ -84,7 +88,7 @@ export default function AdminOrderDetails() {
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
-            <option value="active">Active</option>
+            <option value="active">Active-Paid</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>

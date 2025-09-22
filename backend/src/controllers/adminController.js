@@ -69,7 +69,6 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // BOATS
 const createBoat = asyncHandler(async (req, res) => {
-
   const boatExists = await Boat.findOne({ name: req.body.name });
   if (boatExists) {
     res.status(400);
@@ -84,7 +83,6 @@ const createBoat = asyncHandler(async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
   const { search, type, status, sort, page = 1, limit = 10 } = req.query;
@@ -137,7 +135,6 @@ const updateBoat = asyncHandler(async (req, res) => {
   }
 });
 
-
 const deleteBoat = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
   if (!boat) {
@@ -168,7 +165,14 @@ const getAllReservations = asyncHandler(async (req, res) => {
 
 const updateReservationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const allowed = ["approved", "rejected", "active", "completed", "cancelled"];
+  const allowed = [
+    "approved",
+    "rejected",
+    "active",
+    "completed",
+    "cancelled",
+    "pending",
+  ];
   if (!allowed.includes(status)) {
     res.status(400);
     throw new Error("Invalid status");

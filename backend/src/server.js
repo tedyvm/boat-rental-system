@@ -9,6 +9,8 @@ const reservationRoutes = require("./routes/reservationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const { protect, admin } = require("./middleware/authMiddleware");
 
+require("./jobs/autoRejectReservations");
+
 require("dotenv").config();
 
 const app = express();
