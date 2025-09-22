@@ -1,5 +1,5 @@
 .navbar-custom {
-  background-color: #0F203A;
+  background-color: #0f203a;
   height: 75px;
   display: flex;
   align-items: center;
@@ -15,20 +15,22 @@
   align-items: center;
 }
 
-.navbar-logo{
-    height: 100%;
+.navbar-logo {
+  height: 100%;
 }
 
 .navbar-logo img {
   height: 100%;
 }
 
-.navbar-contacts {
+.navbar-contacts a, .navbar-contacts {
   display: flex;
   align-items: center;
   gap: 2rem;
   color: white;
+  text-decoration: none;
 }
+
 
 .navbar-contacts .contact-item {
   display: flex;
@@ -49,6 +51,43 @@
   opacity: 0.8;
 }
 
-.contact-item{
+.contact-item {
   color: white;
 }
+/* Overlay – viso ekrano click zona */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent; /* gali naudoti rgba(0,0,0,0.3) jei nori tamsinti foną */
+  z-index: 999;
+}
+
+/* Dropdown meniu */
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.menu-dropdown .nav-item {
+  list-style: none;
+  margin-bottom: 0.5rem;
+}
+
+.menu-dropdown .nav-link {
+  display: block;
+  color: #333;
+  text-decoration: none;
+}
+
+.menu-dropdown .nav-link:hover {
+  text-decoration: underline;
+}
+

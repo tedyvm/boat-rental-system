@@ -9,16 +9,27 @@ const recalcBoatRating = async (boatId) => {
 
   const result = await Review.aggregate([
     { $match: { boat: objectId } },
-    { $group: { _id: "$boat", avgRating: { $avg: "$rating" } } },
+    {
+      $group: {
+        _id: "$boat",
+        avgRating: { $avg: "$rating" },
+        count: { $sum: 1 },
+      },
+    },
   ]);
 
   const avg = result.length > 0 ? result[0].avgRating : 0;
-  await Boat.findByIdAndUpdate(objectId, { rating: avg }, { new: true });
+  const count = result.length > 0 ? result[0].count : 0;
+
+  const updatedBoat = await Boat.findByIdAndUpdate(
+    objectId,
+    { rating: avg, numberOfReviews: count },
+    { new: true }
+  );
+
+  return updatedBoat;
 };
 
-// @desc    Sukurti arba atnaujinti savo įvertinimą
-// @route   POST /api/reviews
-// @access  Private
 const createOrUpdateReview = asyncHandler(async (req, res) => {
   const { boatId, rating, comment } = req.body;
   if (!boatId || !rating) {
@@ -64,14 +75,11 @@ const createOrUpdateReview = asyncHandler(async (req, res) => {
   }
 
   await recalcBoatRating(boatId);
-  const updatedBoat = await Boat.findById(boatId);
-
+  const updatedBoat = await recalcBoatRating(boatId);
   res.status(201).json({ message: "Review saved", review, updatedBoat });
 });
 
-// @desc    Gauti visus įvertinimus laivui
-// @route   GET /api/reviews/boat/:boatId
-// @access  Public
+
 const getBoatReviews = asyncHandler(async (req, res) => {
   const reviews = await Review.find({ boat: req.params.boatId })
     .populate("user", "username email")
@@ -80,9 +88,7 @@ const getBoatReviews = asyncHandler(async (req, res) => {
   res.json(reviews);
 });
 
-// @desc    Gauti vidutinį įvertinimą laivui
-// @route   GET /api/reviews/boat/:boatId/average
-// @access  Public
+
 const getBoatAverageRating = asyncHandler(async (req, res) => {
   const result = await Review.aggregate([
     { $match: { boat: req.params.boatId } },
@@ -95,9 +101,7 @@ const getBoatAverageRating = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Ištrinti savo review
-// @route   DELETE /api/reviews/:id
-// @access  Private
+
 const deleteReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
   if (!review) {
@@ -106,7 +110,10 @@ const deleteReview = asyncHandler(async (req, res) => {
   }
 
   // Tik savininkas arba admin gali trinti
-  if (review.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  if (
+    review.user.toString() !== req.user._id.toString() &&
+    req.user.role !== "admin"
+  ) {
     res.status(403);
     throw new Error("Not authorized to delete this review");
   }

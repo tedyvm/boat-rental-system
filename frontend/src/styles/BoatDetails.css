@@ -1,0 +1,5 @@
+.availability-sidebar {
+  position: sticky;
+  top:40px;
+  align-self: start;
+}

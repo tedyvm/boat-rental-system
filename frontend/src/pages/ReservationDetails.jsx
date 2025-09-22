@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import "../styles/ReservationDetails.css";
 
 export default function ReservationDetails() {
   const { token } = useContext(AuthContext);
@@ -20,9 +21,12 @@ export default function ReservationDetails() {
     const fetchReservation = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:5000/api/reservations/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `http://localhost:5000/api/reservations/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (!res.ok) throw new Error("Reservation not found");
         const data = await res.json();
         setReservation(data);
@@ -38,7 +42,9 @@ export default function ReservationDetails() {
 
   const fetchMyReview = async (boatId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/boat/${boatId}`);
+      const res = await fetch(
+        `http://localhost:5000/api/reviews/boat/${boatId}`
+      );
       if (!res.ok) return;
       const reviews = await res.json();
       const mine = reviews.find((r) => r.user?._id === reservation?.user?._id);
@@ -120,10 +126,13 @@ export default function ReservationDetails() {
     if (!myReview) return;
     if (!window.confirm("Are you sure you want to delete your review?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${myReview._id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/reviews/${myReview._id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!res.ok) throw new Error("Failed to delete review");
       alert("Review deleted");
       setMyReview(null);
@@ -140,29 +149,48 @@ export default function ReservationDetails() {
 
   return (
     <div className="container mt-4">
-      <button className="btn btn-link mb-3" onClick={() => navigate("/reservations/me")}>
+      <button
+        className="btn btn-link mb-3"
+        onClick={() => navigate("/reservations/me")}
+      >
         ← Back
       </button>
       <h2>Reservation Details</h2>
 
       <div className="card p-3 shadow-sm">
-        <h4>{reservation.boat?.name}</h4>
-        <p><strong>Type:</strong> {reservation.boat?.type}</p>
-        <p><strong>Start Date:</strong> {new Date(reservation.startDate).toLocaleDateString()}</p>
-        <p><strong>End Date:</strong> {new Date(reservation.endDate).toLocaleDateString()}</p>
+        <h4 onClick={() => navigate(`/boats/${reservation.boat?._id}`)}>
+          {reservation.boat?.name}
+        </h4>
+        <p>
+          <strong>Type:</strong> {reservation.boat?.type}
+        </p>
+        <p>
+          <strong>Start Date:</strong>{" "}
+          {new Date(reservation.startDate).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>End Date:</strong>{" "}
+          {new Date(reservation.endDate).toLocaleDateString()}
+        </p>
         <p>
           <strong>Status:</strong>{" "}
-          <span className={`badge ${
-            reservation.status === "approved"
-              ? "bg-success"
-              : reservation.status === "pending"
-              ? "bg-warning text-dark"
-              : "bg-secondary"
-          }`}>
+          <span
+            className={`badge ${
+              reservation.status === "approved"
+                ? "bg-success"
+                : reservation.status === "pending"
+                ? "bg-warning text-dark"
+                : "bg-secondary"
+            }`}
+          >
             {reservation.status}
           </span>
         </p>
-        {reservation.note && <p><strong>Note:</strong> {reservation.note}</p>}
+        {reservation.note && (
+          <p>
+            <strong>Note:</strong> {reservation.note}
+          </p>
+        )}
 
         {reservation.status === "pending" && (
           <div className="mt-3 d-flex gap-2">
@@ -204,7 +232,11 @@ export default function ReservationDetails() {
               onChange={(e) => setComment(e.target.value)}
             />
             <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary" disabled={submitting}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={submitting}
+              >
                 {myReview ? "Update Review" : "Submit Review"}
               </button>
               {myReview && (

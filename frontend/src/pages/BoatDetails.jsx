@@ -4,13 +4,12 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import AvailabilityMenu from "../components/AvailabilityMenu";
 import { createReservation } from "../utils/reservation";
+import StarRating from "../components/StarRating";
+import ReviewList from "../components/ReviewList";
+import "../styles/BoatDetails.css";
 
 export default function BoatDetails() {
   const { id } = useParams();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const startDate = searchParams.get("startDate");
-  const endDate = searchParams.get("endDate");
 
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +58,7 @@ export default function BoatDetails() {
     <div className="container mt-4">
       <div className="row">
         {/* Availability sidebar */}
-        <div className="col-md-3 order-2 order-md-1">
+        <div className="col-md-3 order-2 order-md-1 availability-sidebar">
           <AvailabilityMenu
             pricePerDay={boat.pricePerDay}
             onReserve={handleReserve}
@@ -121,6 +120,20 @@ export default function BoatDetails() {
           <div className="mt-3">
             <h4>Description</h4>
             <p>{boat.description}</p>
+          </div>
+          <div className="mt-4">
+            <h4 className="mb-2">Reviews</h4>
+
+            {/* Žvaigždutės + bendras vidurkis */}
+            <div className="d-flex align-items-center mb-3">
+              <StarRating rating={boat.rating} size={24} />
+              <span className="ms-2 text-muted">
+                {boat.rating.toFixed(1)} / 5 ({boat.numberOfReviews} reviews)
+              </span>
+            </div>
+
+            {/* Review sąrašas */}
+            <ReviewList boatId={boat._id} />
           </div>
         </div>
       </div>

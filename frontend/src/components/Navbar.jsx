@@ -13,7 +13,7 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     setMenuOpen(false);
-    navigate("/");
+    navigate("../");
   };
 
   return (
@@ -42,7 +42,7 @@ export default function Navbar() {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>+370 66 151515</span>
+            <span><a href="tel:+37066151515">+370 66 151515</a></span>
           </div>
           <div className="contact-item">
             <svg
@@ -67,7 +67,7 @@ export default function Navbar() {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>info@sailgo.com</span>
+            <span><a href="mailto:info@sailgo.com">info@sailgo.com</a></span>
           </div>
         </div>
 
@@ -77,25 +77,29 @@ export default function Navbar() {
             className="navbar-login col-md-3 col-sm-6 d-flex justify-content-end pe-3 btn btn-link text-white text-decoration-none"
             onClick={() => setShowLogin(true)}
           >
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-              {/* login icon */}
-            </svg>
             <span className="ms-2">Log In</span>
           </button>
         ) : (
-          <div className="col-md-3 col-sm-6 d-flex justify-content-end align-items-center pe-3 position-relative">
+          <div
+            /* Svarbu: NEBETURIME onClick ant VISOS dėžutės */
+            className="col-md-3 col-sm-6 d-flex justify-content-end align-items-center pe-3 position-relative"
+          >
             <span className="me-2 contact-item">
               Welcome, <b>{user.name || user.username}</b>
             </span>
 
+            {/* Tik mygtukas atidaro/uždaro */}
             <button
+              type="button"
               className="btn p-0"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              aria-controls="user-menu"
               onClick={() => setMenuOpen((prev) => !prev)}
               style={{ background: "none", border: "none" }}
             >
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                 <path
-                  color="white"
                   d="M3 6h18M3 12h18M3 18h18"
                   stroke="white"
                   strokeWidth="2"
@@ -104,13 +108,24 @@ export default function Navbar() {
               </svg>
             </button>
 
+            {/* Pats dropdown — pririštas prie šito konteinerio */}
             {menuOpen && (
               <div
-                className="position-absolute bg-white border rounded shadow p-2"
-                style={{ top: "100%", right: 0, zIndex: 1000 }}
+                id="user-menu"
+                role="menu"
+                className="menu-dropdown"
+                onClick={(e) =>
+                  e.stopPropagation()
+                } /* apsauga, jei kada nors uždėsi onClick viršuje */
               >
                 <li className="nav-item">
-                  <Link className="nav-link" to="/reservations/me">
+                  <Link
+                    className="nav-link"
+                    to="/reservations/me"
+                    onClick={() =>
+                      setMenuOpen(false)
+                    } /* uždaryti po navigacijos */
+                  >
                     My Orders
                   </Link>
                 </li>
@@ -125,14 +140,15 @@ export default function Navbar() {
           </div>
         )}
       </div>
+      {menuOpen && (
+        <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
+      )}
 
       {/* Login Modal */}
       {showLogin && (
         <LoginModal
           onClose={() => setShowLogin(false)}
-          onSuccess={() => {
-            setShowLogin(false);
-          }}
+          onSuccess={() => setShowLogin(false)}
         />
       )}
     </header>

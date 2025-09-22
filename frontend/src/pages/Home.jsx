@@ -1,12 +1,44 @@
-import { useState } from "react";
-import { DateRange } from "react-date-range";
-import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../styles/Home.css";
 import SearchBar from "../components/SearchBar";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const [counts, setCounts] = useState({
+    sailingYacht: 0,
+    catamaran: 0,
+  });
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Gali naudoti savo esamą API
+        const [sailingRes, catRes] = await Promise.all([
+          fetch("http://localhost:5000/api/boats/search?type=Sailing+Yacht"),
+          fetch("http://localhost:5000/api/boats/search?type=Catamaran"),
+        ]);
+
+        if (!sailingRes.ok || !catRes.ok) throw new Error("Failed to fetch boats");
+
+        const sailingData = await sailingRes.json();
+        const catData = await catRes.json();
+
+        setCounts({
+          sailingYacht: sailingData.length,
+          catamaran: catData.length,
+        });
+      } catch (err) {
+        console.error("Error fetching counts:", err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
+
   const handleSearch = (filters) => {
     console.log("Filters:", filters);
     // čia galėsi daryti redirect į /boats su query parametrais
@@ -42,16 +74,16 @@ export default function Home() {
         <p>Wide choice online for the best prices</p>
         {/* S1 */}
         <div className="row g-4">
-          <div className="col-12 col-lg-6 p-3">
+          <div className="col-12 col-lg-6 p-3" onClick={() => navigate('/boats?type=Sailing+Yacht')}>
             <div className="s1c1 align-content-end text-center p-4">
-              <h3>Monohull</h3>
-              <p>5226 Yachts</p>
+              <h3>Sailing Yacht</h3>
+              <p>{counts.sailingYacht} Yachts</p>
             </div>
           </div>
-          <div className="col-12 col-lg-6 p-3">
+          <div className="col-12 col-lg-6 p-3 " onClick={() => navigate('/boats?type=Catamaran')}>
             <div className="s1c2 align-content-end text-center p-4">
               <h3>Catamaran</h3>
-              <p>3221 Yachts</p>
+              <p>{counts.catamaran} Catamarans</p>
             </div>
           </div>
         </div>

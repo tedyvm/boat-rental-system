@@ -113,7 +113,7 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
               />
               <div className="text-end mt-2">
                 <button
-                  className="btn btn-sm btn-primary"
+                  className="button"
                   onClick={() => setShowCalendar(false)}
                 >
                   Done
@@ -135,7 +135,7 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
         </div>
       )}
 
-      <button className="btn btn-primary w-100" onClick={handleReserveClick}>
+      <button className="button" onClick={handleReserveClick}>
         Reserve
       </button>
     </div>
