@@ -12,7 +12,9 @@ export default function Home() {
     sailingYacht: 0,
     catamaran: 0,
   });
+  const [filters, setFilters] = useState({});
 
+  // Fetchinam burių jachtų ir katamaranų skaičių
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -22,7 +24,8 @@ export default function Home() {
           fetch("http://localhost:5000/api/boats/search?type=Catamaran"),
         ]);
 
-        if (!sailingRes.ok || !catRes.ok) throw new Error("Failed to fetch boats");
+        if (!sailingRes.ok || !catRes.ok)
+          throw new Error("Failed to fetch boats");
 
         const sailingData = await sailingRes.json();
         const catData = await catRes.json();
@@ -39,10 +42,17 @@ export default function Home() {
     fetchCounts();
   }, []);
 
-  const handleSearch = (filters) => {
-    console.log("Filters:", filters);
-    // čia galėsi daryti redirect į /boats su query parametrais
-    // pvz.: navigate(`/boats?${new URLSearchParams(filters)}`);
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+
+    if (filters.type) params.set("type", filters.type);
+    if (filters.startDate)
+      params.set("startDate", filters.startDate.toISOString().slice(0, 10));
+    if (filters.endDate)
+      params.set("endDate", filters.endDate.toISOString().slice(0, 10));
+    if (filters.withCaptain) params.set("withCaptain", "true");
+
+    navigate(`/boats?${params.toString()}`);
   };
 
   return (
@@ -64,7 +74,12 @@ export default function Home() {
       {/* Search Bar */}
       <div className="container-fluid search-bar">
         <div className="container">
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar
+            filters={filters}
+            onChange={setFilters}
+            onSearch={handleSearch}
+            showButton={true}
+          />
         </div>
       </div>
 
@@ -74,13 +89,19 @@ export default function Home() {
         <p>Wide choice online for the best prices</p>
         {/* S1 */}
         <div className="row g-4">
-          <div className="col-12 col-lg-6 p-3" onClick={() => navigate('/boats?type=Sailing+Yacht')}>
+          <div
+            className="col-12 col-lg-6 p-3"
+            onClick={() => navigate("/boats?type=Sailing+Yacht")}
+          >
             <div className="s1c1 align-content-end text-center p-4">
               <h3>Sailing Yacht</h3>
               <p>{counts.sailingYacht} Yachts</p>
             </div>
           </div>
-          <div className="col-12 col-lg-6 p-3 " onClick={() => navigate('/boats?type=Catamaran')}>
+          <div
+            className="col-12 col-lg-6 p-3 "
+            onClick={() => navigate("/boats?type=Catamaran")}
+          >
             <div className="s1c2 align-content-end text-center p-4">
               <h3>Catamaran</h3>
               <p>{counts.catamaran} Catamarans</p>

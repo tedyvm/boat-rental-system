@@ -1,157 +1,77 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
-import {
-  addDays,
-  differenceInCalendarDays,
-  format,
-  isBefore,
-  isAfter,
-  parseISO,
-} from "date-fns";
-import { useLocation, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../styles/SearchBar.css";
 
-export default function SearchBar({ showButton = true, onFiltersChange }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const today = new Date();
-  const minStart = addDays(today, 3);
-
-  const searchParams = new URLSearchParams(location.search);
-  const typeFromUrl = searchParams.get("type") || "";
-  const withCaptainFromUrl = searchParams.get("withCaptain") === "true";
-  const startFromUrl = searchParams.get("startDate")
-    ? parseISO(searchParams.get("startDate") + "T00:00:00")
-    : null;
-  const endFromUrl = searchParams.get("endDate")
-    ? parseISO(searchParams.get("endDate") + "T00:00:00")
-    : null;
-
-  const [type, setType] = useState(typeFromUrl);
-  const [withCaptain, setWithCaptain] = useState(withCaptainFromUrl);
-  const [dateRange, setDateRange] = useState([
-    { startDate: startFromUrl, endDate: endFromUrl, key: "selection" },
-  ]);
+export default function SearchBar({
+  filters = {},
+  onChange,
+  onSearch,
+  showButton = true,
+}) {
   const [showCalendar, setShowCalendar] = useState(false);
-  const [selectingStart, setSelectingStart] = useState(false);
-  const [dateInputValue, setDateInputValue] = useState(
-    startFromUrl && endFromUrl
-      ? `${format(startFromUrl, "yyyy-MM-dd")} → ${format(
-          endFromUrl,
-          "yyyy-MM-dd"
-        )}`
-      : "When do you want to start?"
-  );
   const [monthsToShow, setMonthsToShow] = useState(1);
 
-  const buildParams = (updated = {}) => {
-    // paimam esamus parametrus iš URL
-    const currentParams = new URLSearchParams(location.search);
+  const startDate = filters.startDate ? new Date(filters.startDate) : null;
+  const endDate = filters.endDate ? new Date(filters.endDate) : null;
 
-    // atnaujinam tik tuos, kuriuos valdo SearchBar
-    if ("type" in updated || type) {
-      if (updated.type || type) {
-        currentParams.set("type", updated.type ?? type);
-      } else {
-        currentParams.delete("type");
-      }
-    }
-
-    if ("withCaptain" in updated || withCaptain) {
-      if (updated.withCaptain ?? withCaptain) {
-        currentParams.set("withCaptain", true);
-      } else {
-        currentParams.delete("withCaptain");
-      }
-    }
-
-    if ("startDate" in updated || dateRange[0].startDate) {
-      if (updated.startDate || dateRange[0].startDate) {
-        currentParams.set(
-          "startDate",
-          format(updated.startDate ?? dateRange[0].startDate, "yyyy-MM-dd")
-        );
-      } else {
-        currentParams.delete("startDate");
-      }
-    }
-
-    if ("endDate" in updated || dateRange[0].endDate) {
-      if (updated.endDate || dateRange[0].endDate) {
-        currentParams.set(
-          "endDate",
-          format(updated.endDate ?? dateRange[0].endDate, "yyyy-MM-dd")
-        );
-      } else {
-        currentParams.delete("endDate");
-      }
-    }
-
-    return currentParams;
-  };
+  const dateInputValue =
+    startDate && endDate
+      ? `${format(startDate, "yyyy-MM-dd")} → ${format(endDate, "yyyy-MM-dd")}`
+      : "Select dates";
 
   const handleDateChange = (item) => {
-    let { startDate, endDate } = item.selection;
-    if (selectingStart) {
-      if (differenceInCalendarDays(endDate, startDate) < 3) {
-        endDate = addDays(startDate, 3);
-      }
-      setDateRange([{ startDate, endDate, key: "selection" }]);
-      setShowCalendar(false);
-      setSelectingStart(false);
-      setDateInputValue(
-        `${format(startDate, "yyyy-MM-dd")} → ${format(endDate, "yyyy-MM-dd")}`
-      );
+    const start = item.selection.startDate;
+    const end = item.selection.endDate;
 
-      if (onFiltersChange) {
-        const params = buildParams({ startDate, endDate });
-        onFiltersChange(Object.fromEntries(params.entries()));
-      }
-    } else {
-      setDateRange([{ startDate, endDate: null, key: "selection" }]);
-      setSelectingStart(true);
+    onChange({
+      ...filters,
+      startDate: start,
+      endDate: end,
+    });
+
+    // Uždaryti tik kai vartotojas pasirinko kitą dieną (ne tą pačią)
+    if (start && end && start.getTime() !== end.getTime()) {
+      setShowCalendar(false);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const params = buildParams();
-    navigate(`/boats?${params.toString()}`, { replace: true });
+    if (onSearch) onSearch();
   };
+
+  useEffect(() => {
+    if (!showButton && onSearch) {
+      onSearch();
+    }
+  }, [filters, showButton, onSearch]);
 
   useEffect(() => {
     const handleResize = () => {
       setMonthsToShow(window.matchMedia("(min-width: 992px)").matches ? 2 : 1);
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Dinaminės klasės pagal showButton
-  const boatTypeCol = showButton ? "col-lg-4" : "col-lg-5";
-  const dateCol = showButton ? "col-lg-4" : "col-lg-5";
-  const skipperCol = "col-lg-2";
+  const boatTypeCol = showButton ? "col-lg-4" : "col-12 col-lg-5";
+  const dateCol = showButton ? "col-lg-4" : "col-12 col-lg-5";
+  const skipperCol = "col-lg-2 col-12";
 
   return (
-    <form className="search-bar" onSubmit={handleSubmit}>
+    <form className="search-bar px-2 p-md-0" onSubmit={handleSubmit}>
       <div className="row g-3 align-items-center">
         {/* Boat Type */}
         <div className={`col-12 col-md-6 ${boatTypeCol}`}>
           <div className="input-group">
             <span className="input-group-text">🚤</span>
             <select
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-                if (onFiltersChange) {
-                  const params = buildParams({ type: e.target.value });
-                  onFiltersChange(Object.fromEntries(params.entries()));
-                }
-              }}
+              value={filters.type || ""}
+              onChange={(e) => onChange({ ...filters, type: e.target.value })}
               className="form-select"
             >
               <option value="" disabled hidden>
@@ -185,16 +105,13 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
                 <DateRange
                   ranges={[
                     {
-                      startDate: dateRange[0].startDate ?? minStart,
-                      endDate:
-                        dateRange[0].endDate ??
-                        dateRange[0].startDate ??
-                        addDays(minStart, 3),
+                      startDate: startDate ?? new Date(),
+                      endDate: endDate ?? new Date(),
                       key: "selection",
                     },
                   ]}
+                  minDate={new Date()}
                   onChange={handleDateChange}
-                  minDate={minStart}
                   rangeColors={["#0d6efd"]}
                   dateDisplayFormat="yyyy-MM-dd"
                   moveRangeOnFirstSelection={false}
@@ -204,12 +121,6 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
                   direction="horizontal"
                   fixedHeight={true}
                   preventSnapRefocus={true}
-                  disabledDay={(day) =>
-                    selectingStart && dateRange[0].startDate
-                      ? isBefore(day, dateRange[0].startDate) ||
-                        isAfter(day, addDays(dateRange[0].startDate, 13))
-                      : false
-                  }
                 />
               </div>
             )}
@@ -223,15 +134,12 @@ export default function SearchBar({ showButton = true, onFiltersChange }) {
               className="form-check-input"
               type="checkbox"
               id="withCaptain"
-              checked={withCaptain}
-              onChange={() => {
-                const newVal = !withCaptain;
-                setWithCaptain(newVal);
-                if (onFiltersChange) {
-                  const params = buildParams({ withCaptain: newVal });
-                  onFiltersChange(Object.fromEntries(params.entries()));
-                }
-              }}
+              checked={
+                filters.withCaptain === true || filters.withCaptain === "true"
+              }
+              onChange={(e) =>
+                onChange({ ...filters, withCaptain: e.target.checked })
+              }
             />
             <label className="form-check-label mb-0" htmlFor="withCaptain">
               With skipper

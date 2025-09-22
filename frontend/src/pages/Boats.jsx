@@ -20,13 +20,29 @@ export default function Boats({ isAdminView = false }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // ✅ Centralizuotas filters state – iš URL
+  const [filters, setFilters] = useState(() =>
+    Object.fromEntries(new URLSearchParams(location.search).entries())
+  );
+
+  // ✅ Centralizuotas sort
   const searchParams = new URLSearchParams(location.search);
   const currentSort = searchParams.get("sort");
 
-  const handleFiltersChange = (filters) => {
-    const params = new URLSearchParams(filters);
+  // ✅ Sinchronizuojam URL kai pasikeičia filters ar sort
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== "" && value != null) params.set(key, value);
+    }
     if (currentSort) params.set("sort", currentSort);
+
     navigate(`/boats?${params.toString()}`, { replace: true });
+  }, [filters, currentSort, navigate]);
+
+  const handleFiltersChange = (updatedFilters) => {
+    setFilters(updatedFilters);
   };
 
   const handleSortChange = (sortOption) => {
@@ -36,6 +52,7 @@ export default function Boats({ isAdminView = false }) {
     navigate(`/boats?${params.toString()}`, { replace: true });
   };
 
+  // ✅ Fetchinam kai pasikeičia location.search (URL)
   useEffect(() => {
     const fetchBoats = async () => {
       try {
@@ -46,11 +63,8 @@ export default function Boats({ isAdminView = false }) {
           : "http://localhost:5000/api/boats/search";
 
         const url = `${baseUrl}${location.search}`;
-
         const res = await fetch(url, {
-          headers: isAdminView
-            ? { Authorization: `Bearer ${token}` }
-            : {},
+          headers: isAdminView ? { Authorization: `Bearer ${token}` } : {},
         });
 
         if (!res.ok) throw new Error("Failed to fetch boats");
@@ -77,17 +91,22 @@ export default function Boats({ isAdminView = false }) {
           Filters
         </Button>
 
-        <Offcanvas show={show} onHide={handleClose} placement="end" className="boats-offcanvas">
+        <Offcanvas
+          show={show}
+          onHide={handleClose}
+          placement="end"
+          className="boats-offcanvas"
+        >
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Filters</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <BoatFilters
+            <SearchBar
+              filters={filters}
               onChange={handleFiltersChange}
-              initialValues={Object.fromEntries(
-                new URLSearchParams(location.search).entries()
-              )}
+              showButton={false}
             />
+            <BoatFilters filters={filters} onChange={handleFiltersChange} />
           </Offcanvas.Body>
         </Offcanvas>
       </div>
@@ -95,19 +114,18 @@ export default function Boats({ isAdminView = false }) {
       {/* SearchBar */}
       <div className="container-fluid search-bar d-none d-md-block">
         <div className="container">
-          <SearchBar showButton={false} onFiltersChange={handleFiltersChange} />
+          <SearchBar
+            filters={filters}
+            onChange={handleFiltersChange}
+            showButton={false}
+          />
         </div>
       </div>
 
       <div className="container mt-4">
         <div className="row">
           <aside className="col-md-3 d-none d-md-block">
-            <BoatFilters
-              onChange={handleFiltersChange}
-              initialValues={Object.fromEntries(
-                new URLSearchParams(location.search).entries()
-              )}
-            />
+            <BoatFilters filters={filters} onChange={handleFiltersChange} />
           </aside>
 
           <section className="col-md-9">
