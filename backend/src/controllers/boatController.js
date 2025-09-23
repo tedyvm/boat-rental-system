@@ -35,57 +35,47 @@ const searchBoats = asyncHandler(async (req, res) => {
     lengthMax,
     cabinsMin,
     location,
+    page = 1,
+    limit = 9, // default 9 per page
   } = req.query;
 
-  let filter = { status: "published" };
+  const filter = { status: "published" };
 
-  // Type
   if (type) filter.type = type;
-
-  // Price range
   if (priceMin || priceMax) filter.pricePerDay = {};
   if (priceMin) filter.pricePerDay.$gte = Number(priceMin);
   if (priceMax) filter.pricePerDay.$lte = Number(priceMax);
-
-  // Capacity
   if (capacityMin || capacityMax) filter.capacity = {};
   if (capacityMin) filter.capacity.$gte = Number(capacityMin);
   if (capacityMax) filter.capacity.$lte = Number(capacityMax);
-
-  // Captain
   if (withCaptain !== undefined) filter.withCaptain = withCaptain === "true";
-
-  // Rating
   if (ratingMin) filter.rating = { $gte: Number(ratingMin) };
-
-  // Year range
   if (yearMin || yearMax) filter.year = {};
   if (yearMin) filter.year.$gte = Number(yearMin);
   if (yearMax) filter.year.$lte = Number(yearMax);
-
-  // Length range
   if (lengthMin || lengthMax) filter.length = {};
   if (lengthMin) filter.length.$gte = Number(lengthMin);
   if (lengthMax) filter.length.$lte = Number(lengthMax);
-
-  // Cabins
   if (cabinsMin) filter.cabins = { $gte: Number(cabinsMin) };
+  if (location) filter.location = { $regex: location, $options: "i" };
 
-  // Location (search as case-insensitive partial match)
-  if (location)
-    filter.location = { $regex: location, $options: "i" };
-
-  // Sort
   let sortOption = {};
   if (sort === "price-asc") sortOption = { pricePerDay: 1 };
   if (sort === "price-desc") sortOption = { pricePerDay: -1 };
   if (sort === "capacity") sortOption = { capacity: -1 };
   if (!sort) sortOption = { createdAt: -1 };
 
-  // Filtruojam
-  let boats = await Boat.find(filter).sort(sortOption);
+  const skip = (Number(page) - 1) * Number(limit);
 
-  // Tikrinam rezervacijas
+  // Pirma pasiimam laivus, kurie atitinka filtrus
+  const total = await Boat.countDocuments(filter);
+
+  let boats = await Boat.find(filter)
+    .sort(sortOption)
+    .skip(skip)
+    .limit(Number(limit));
+
+  // Filtruojam pagal datas (jeigu nurodytos)
   if (startDate && endDate) {
     const sDate = new Date(startDate);
     const eDate = new Date(endDate);
@@ -102,10 +92,15 @@ const searchBoats = asyncHandler(async (req, res) => {
       })
     );
 
-    boats = boats.filter((b) => b !== null);
+    boats = boats.filter(Boolean);
   }
 
-  res.json(boats);
+  res.json({
+    boats,
+    total,
+    page: Number(page),
+    pages: Math.ceil(total / Number(limit)),
+  });
 });
 
 const getBookedDates = asyncHandler(async (req, res) => {

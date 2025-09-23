@@ -13,17 +13,18 @@ import Register from "./pages/Register";
 import Boats from "./pages/Boats";
 import BoatDetails from "./pages/BoatDetails";
 import { AuthProvider } from "./context/AuthContext";
-import AdminBoatList from "./pages/Admin/AdminBoatList";
-import AdminBoatDetails from "./pages/Admin/AdminBoatDetails";
+import AdminBoatDetails from "./pages/Admin/Boats/AdminBoatDetails";
 import AdminAddBoat from "./pages/Admin/AdminAddBoat";
 import MyOrders from "./pages/MyOrders";
 import ReservationDetails from "./pages/ReservationDetails";
 import ReservationEdit from "./pages/ReservationEdit";
-import AdminOrdersList from "./components/admin/AdminOrdersList";
-import AdminOrderDetails from "./components/admin/AdminOrderDetails";
-import AdminUserList from "./pages/Admin/AdminUserList";
+import AdminOrderDetails from "./pages/Admin/Reservations/AdminOrderDetails";
 import AdminUserEdit from "./pages/Admin/AdminUserEdit";
-import AdminReviewList from "./pages/Admin/AdminReviewList";
+import ReviewListContainer from "./pages/Admin/Reviews/ReviewListContainer";
+import UserListContainer from "./pages/Admin/Users/UserListContainer";
+import ReviewList from "./components/ReviewList";
+import ReservationListContainer from "./pages/Admin/Reservations/ReservationListContainer";
+import BoatListContainer from "./pages/Admin/Boats/BoatListContainer";
 
 const router = createBrowserRouter([
   {
@@ -46,15 +47,14 @@ const router = createBrowserRouter([
     path: "/admin",
     element: <AdminLayout />,
     children: [
-      { path: "boats", element: <AdminBoatList /> },
+      { path: "boats", element: <BoatListContainer /> },
       { path: "boats/new", element: <AdminAddBoat /> },
       { path: "boats/:id", element: <AdminBoatDetails /> },
-      { path: "reservations", element: <AdminOrdersList /> },
+      { path: "reservations", element: <ReservationListContainer /> },
       { path: "reservations/:id", element: <AdminOrderDetails /> },
-      { path: "users", element: <AdminUserList /> },
+      { path: "users", element: <UserListContainer /> },
       { path: "users/:id", element: <AdminUserEdit /> },
-      { path: "reviews", element: <AdminReviewList /> },
-
+      { path: "reviews", element: <ReviewListContainer /> },
     ],
   },
 ]);
