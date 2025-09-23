@@ -11,10 +11,37 @@ const getAllUsers = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
 
-  const count = await User.countDocuments({});
-  const users = await User.find({})
+  // Paieškos filtrai
+  const filter = {};
+
+  if (req.query.name) {
+    filter.name = { $regex: req.query.name, $options: "i" };
+  }
+
+  if (req.query.familyName) {
+    filter.familyName = { $regex: req.query.familyName, $options: "i" };
+  }
+
+  if (req.query.username) {
+    filter.username = { $regex: req.query.username, $options: "i" };
+  }
+
+  if (req.query.role && req.query.role !== "all") {
+    filter.role = req.query.role;
+  }
+
+  // Rūšiavimas
+  let sortField = req.query.sortField || "createdAt";
+  let sortDirection = req.query.sortDirection === "asc" ? 1 : -1;
+  const sortObj = { [sortField]: sortDirection };
+
+  // Skaičiuojame bendrą kiekį
+  const count = await User.countDocuments(filter);
+
+  // Paimame puslapį
+  const users = await User.find(filter)
     .select("-password")
-    .sort({ createdAt: -1 })
+    .sort(sortObj)
     .skip((page - 1) * limit)
     .limit(limit);
 
@@ -22,6 +49,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
     users,
     page,
     pages: Math.ceil(count / limit),
+    total: count,
   });
 });
 
@@ -85,22 +113,22 @@ const createBoat = asyncHandler(async (req, res) => {
 });
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
-  const { search, type, status, sort, page = 1, limit = 10 } = req.query;
+  const { name, location, type, status, sortField, sortDirection, page = 1, limit = 10 } = req.query;
 
   const filter = {};
 
-  if (search) {
-    filter.name = { $regex: search, $options: "i" }; // paieška pagal pavadinimą
-  }
+  if (name) filter.name = { $regex: name, $options: "i" };
+  if (location) filter.location = { $regex: location, $options: "i" };
   if (type) filter.type = type;
   if (status) filter.status = status;
 
+  // Dinaminis rūšiavimas
   let sortOption = {};
-  if (sort === "price-asc") sortOption = { pricePerDay: 1 };
-  if (sort === "price-desc") sortOption = { pricePerDay: -1 };
-  if (sort === "capacity-asc") sortOption = { capacity: 1 };
-  if (sort === "capacity-desc") sortOption = { capacity: -1 };
-  if (!sort) sortOption = { createdAt: -1 }; // naujausi viršuje
+  if (sortField) {
+    sortOption[sortField] = sortDirection === "asc" ? 1 : -1;
+  } else {
+    sortOption = { createdAt: -1 };
+  }
 
   const skip = (Number(page) - 1) * Number(limit);
 
@@ -116,6 +144,7 @@ const getAllBoatsAdmin = asyncHandler(async (req, res) => {
     pages: Math.ceil(total / Number(limit)),
   });
 });
+
 
 const updateBoat = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
@@ -150,18 +179,65 @@ const deleteBoat = asyncHandler(async (req, res) => {
 // RESERVATIONS
 
 const getAllReservations = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortField = req.query.sortField || "startDate";
+  const sortDirection = req.query.sortDirection === "asc" ? 1 : -1;
+
+  const boatSearch = req.query.boat || "";
+  const userSearch = req.query.user || "";
+  const statuses = req.query.statuses ? req.query.statuses.split(",") : [];
+
   const filter = {};
-  if (req.query.status) filter.status = req.query.status;
-  if (req.query.boatId) filter.boat = req.query.boatId;
-  if (req.query.userId) filter.user = req.query.userId;
+
+  // Filtras pagal statusus
+  if (statuses.length > 0) {
+    filter.status = { $in: statuses };
+  }
+
+  // Filtras pagal boat name
+  if (boatSearch) {
+    const matchingBoats = await Boat.find({
+      name: { $regex: boatSearch, $options: "i" },
+    }).select("_id");
+    const boatIds = matchingBoats.map((b) => b._id);
+    if (boatIds.length > 0) {
+      filter.boat = { $in: boatIds };
+    } else {
+      return res.json({ reservations: [], total: 0, page, totalPages: 0 });
+    }
+  }
+
+  // Filtras pagal user username
+  if (userSearch) {
+    const matchingUsers = await User.find({
+      username: { $regex: userSearch, $options: "i" },
+    }).select("_id");
+    const userIds = matchingUsers.map((u) => u._id);
+    if (userIds.length > 0) {
+      filter.user = { $in: userIds };
+    } else {
+      return res.json({ reservations: [], total: 0, page, totalPages: 0 });
+    }
+  }
+
+  const total = await Reservation.countDocuments(filter);
 
   const reservations = await Reservation.find(filter)
-    .populate("boat", "name type")
+    .populate("boat", "name")
     .populate("user", "username email")
-    .sort({ startDate: 1 });
+    .sort({ [sortField]: sortDirection })
+    .skip((page - 1) * limit)
+    .limit(limit);
 
-  res.json(reservations);
+  res.json({
+    reservations,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
 });
+
 
 const updateReservationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
@@ -220,17 +296,59 @@ const getBoatByIdAdmin = asyncHandler(async (req, res) => {
 // Reviews
 
 const getAllReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find({})
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortField = req.query.sortField || "createdAt";
+  const sortDirection = req.query.sortDirection === "asc" ? 1 : -1;
+
+  const boatSearch = req.query.boat || "";
+  const userSearch = req.query.user || "";
+
+  const filter = {};
+
+  // --- FILTRAS pagal boat name ---
+  if (boatSearch) {
+    const matchingBoats = await Boat.find({
+      name: { $regex: boatSearch, $options: "i" },
+    }).select("_id");
+    const boatIds = matchingBoats.map((b) => b._id);
+    if (boatIds.length > 0) {
+      filter.boat = { $in: boatIds };
+    } else {
+      // Jei nerasta nei vieno laivo → grąžinam tuščią atsakymą
+      return res.json({ reviews: [], total: 0, page, totalPages: 0 });
+    }
+  }
+
+  // --- FILTRAS pagal user username ---
+  if (userSearch) {
+    const matchingUsers = await User.find({
+      username: { $regex: userSearch, $options: "i" },
+    }).select("_id");
+    const userIds = matchingUsers.map((u) => u._id);
+    if (userIds.length > 0) {
+      filter.user = { $in: userIds };
+    } else {
+      return res.json({ reviews: [], total: 0, page, totalPages: 0 });
+    }
+  }
+
+  const total = await Review.countDocuments(filter);
+
+  const reviews = await Review.find(filter)
     .populate("boat", "name")
     .populate("user", "username email")
-    .sort({ createdAt: -1 });
-  res.json(reviews);
-});
+    .sort({ [sortField]: sortDirection })
+    .skip((page - 1) * limit)
+    .limit(limit);
 
-module.exports = {
-  getAllReviews,
-  // kiti controlleriai...
-};
+  res.json({
+    reviews,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
+});
 
 const deleteReviewAdmin = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
