@@ -17,6 +17,7 @@ const {
   getAllReviews,
   deleteReviewAdmin,
   getTopReservedBoats,
+  getReservationById,
 } = require("../controllers/adminController");
 
 // USERS
@@ -28,6 +29,7 @@ router.delete("/users/:id", protect, admin, deleteUser); // Adminas trina bet ku
 
 // RESERVATIONS
 router.get("/reservations", protect, admin, getAllReservations);
+router.get("/reservations/:id", protect, admin, getAllReservations);
 router.put("/reservations/:id/status", protect, admin, updateReservationStatus);
 router.delete("/reservations/:id", protect, admin, deleteReservation);
 

@@ -246,6 +246,19 @@ const getAllReservations = asyncHandler(async (req, res) => {
   });
 });
 
+const getReservationById = asyncHandler(async (req, res) => {
+  const reservation = await Reservation.findById(req.params.id)
+    .populate("boat")
+    .populate("user");
+
+  if (!reservation) {
+    res.status(404);
+    throw new Error("Reservation not found");
+  }
+
+  res.json(reservation);
+});
+
 const updateReservationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const allowed = [
@@ -431,4 +444,5 @@ module.exports = {
   deleteReviewAdmin,
   deleteReservation,
   getTopReservedBoats,
+  getReservationById,
 };
