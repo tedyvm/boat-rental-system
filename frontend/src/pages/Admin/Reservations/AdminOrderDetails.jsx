@@ -16,13 +16,14 @@ export default function AdminOrderDetails() {
       try {
         setLoading(true);
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/admin/reservations?id=${id}`,
+          `${import.meta.env.VITE_API_URL}/api/admin/reservations/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        console.log("Fetch status:", res.status);
         if (!res.ok) throw new Error("Failed to fetch order");
         const data = await res.json();
-        setOrder(data.find((r) => r._id === id)); // jei API gražina sąrašą
-        setStatus(data.find((r) => r._id === id)?.status || "");
+        setOrder(data); // jei API gražina sąrašą
+        setStatus(data.status || "");
       } catch (err) {
         console.error(err);
       } finally {
@@ -68,15 +69,42 @@ export default function AdminOrderDetails() {
     <div className="container mt-4">
       <h2>Order Details</h2>
       <div className="card p-3 shadow-sm">
-        <p onClick={() => navigate(`/admin/boats/${order.boat?._id}`)} style={{ cursor: "pointer" }}><strong>Boat:</strong> {order.boat?.name}</p>
-        <p onClick={() => navigate(`/admin/users/${order.user?._id}`)} style={{ cursor: "pointer" }}><strong>User:</strong> {order.user?.username}</p>
-        <p><strong>Start Date:</strong> {new Date(order.startDate).toLocaleDateString()}</p>
-        <p><strong>End Date:</strong> {new Date(order.endDate).toLocaleDateString()}</p>
-        <p><strong>Current Status:</strong> {order.status}</p>
-        <p><strong>Total Price:</strong> ${order.totalPrice?.toFixed(2)}</p>
-        <p><strong>Payment Status:</strong> {order.isPaid ? "Paid" : "Not Paid"}</p>
-        <p><strong>Created At:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
-        <p><strong>Comments:</strong> {order.comments || "No comments"}</p>
+        <p
+          onClick={() => navigate(`/admin/boats/${order.boat?._id}`)}
+          style={{ cursor: "pointer" }}
+        >
+          <strong>Boat:</strong> {order.boat?.name}
+        </p>
+        <p
+          onClick={() => navigate(`/admin/users/${order.user?._id}`)}
+          style={{ cursor: "pointer" }}
+        >
+          <strong>User:</strong> {order.user?.username}
+        </p>
+        <p>
+          <strong>Start Date:</strong>{" "}
+          {new Date(order.startDate).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>End Date:</strong>{" "}
+          {new Date(order.endDate).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>Current Status:</strong> {order.status}
+        </p>
+        <p>
+          <strong>Total Price:</strong> ${order.totalPrice?.toFixed(2)}
+        </p>
+        <p>
+          <strong>Payment Status:</strong> {order.isPaid ? "Paid" : "Not Paid"}
+        </p>
+        <p>
+          <strong>Created At:</strong>{" "}
+          {new Date(order.createdAt).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>Comments:</strong> {order.comments || "No comments"}
+        </p>
 
         <div className="mb-3">
           <label className="form-label fw-bold">Change Status</label>

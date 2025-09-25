@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const RES_STATUSES = [
   "pending",   // laukia admin patvirtinimo
-  "approved",  // patvirtinta, dar neprasidėjo
-  "rejected",  // atmesta
+  "paid",  // patvirtinta, dar neprasidėjo
+  "timed-out",  // atmesta
   "active",    // dabar vyksta
   "completed", // įvykdyta
   "cancelled", // atšaukta vartotojo ar admin
