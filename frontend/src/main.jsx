@@ -25,6 +25,8 @@ import UserListContainer from "./pages/Admin/Users/UserListContainer";
 import ReviewList from "./components/ReviewList";
 import ReservationListContainer from "./pages/Admin/Reservations/ReservationListContainer";
 import BoatListContainer from "./pages/Admin/Boats/BoatListContainer";
+import TopReservedBoatsReport from "./pages/Admin/TopReservedBoats";
+import TopReservedBoats from "./pages/Admin/TopReservedBoats";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,7 @@ const router = createBrowserRouter([
       { path: "users", element: <UserListContainer /> },
       { path: "users/:id", element: <AdminUserEdit /> },
       { path: "reviews", element: <ReviewListContainer /> },
+      { path: "reports/top-reserved-boats", element: <TopReservedBoats /> },
     ],
   },
 ]);

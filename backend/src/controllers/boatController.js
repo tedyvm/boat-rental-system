@@ -127,9 +127,39 @@ const getBookedDates = asyncHandler(async (req, res) => {
   res.json(bookedDates);
 });
 
+const getFilterLimits = asyncHandler(async (req, res) => {
+  const [result] = await Boat.aggregate([
+    { $match: { status: "published" } },
+    {
+      $group: {
+        _id: null,
+        minPrice: { $min: "$pricePerDay" },
+        maxPrice: { $max: "$pricePerDay" },
+        minCapacity: { $min: "$capacity" },
+        maxCapacity: { $max: "$capacity" },
+        minYear: { $min: "$year" },
+        maxYear: { $max: "$year" },
+        minLength: { $min: "$length" },
+        maxLength: { $max: "$length" },
+        minCabins: { $min: "$cabins" },
+        maxCabins: { $max: "$cabins" },
+      },
+    },
+  ]);
+
+  res.json({
+    price: { min: result?.minPrice ?? 0, max: result?.maxPrice ?? 0 },
+    capacity: { min: result?.minCapacity ?? 0, max: result?.maxCapacity ?? 0 },
+    year: { min: result?.minYear ?? 0, max: result?.maxYear ?? 0 },
+    length: { min: result?.minLength ?? 0, max: result?.maxLength ?? 0 },
+    cabins: { min: result?.minCabins ?? 0, max: result?.maxCabins ?? 0 },
+  });
+});
+
 module.exports = {
   getBoats,
   getBoatById,
   searchBoats,
   getBookedDates,
+  getFilterLimits,
 };

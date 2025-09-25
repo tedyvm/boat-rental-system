@@ -156,7 +156,7 @@ export default function ReservationDetails() {
       alert("Payment failed");
     }
     alert("Payment successful! Reservation is now approved.");
-    setReservation((prev) => ({ ...prev, status: "approved" }));
+    setReservation((prev) => ({ ...prev, status: "paid" }));
   }
 
   if (loading) return <p>Loading reservation...</p>;
@@ -191,7 +191,7 @@ export default function ReservationDetails() {
           <strong>Status:</strong>{" "}
           <span
             className={`badge ${
-              reservation.status === "approved"
+              reservation.status === "paid"
                 ? "bg-success"
                 : reservation.status === "pending"
                 ? "bg-warning text-dark"

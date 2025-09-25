@@ -69,7 +69,7 @@ export default function ReservationTable({
             <td>
               <span
                 className={`badge ${
-                  o.status === "approved"
+                  o.status === "paid"
                     ? "bg-success"
                     : o.status === "pending"
                     ? "bg-warning text-dark"

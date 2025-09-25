@@ -13,7 +13,7 @@ async function autoRejectReservations() {
         status: "pending",
         createdAt: { $lte: cutoff },
       },
-      { $set: { status: "rejected" } }
+      { $set: { status: "timed-out" } }
     );
 
     console.log(

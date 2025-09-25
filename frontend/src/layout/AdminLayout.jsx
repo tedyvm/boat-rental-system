@@ -9,10 +9,9 @@ export default function AdminLayout() {
 
   const handleSubmit = () => {
     logout();
-    navigate("/");
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   if (user.role !== "admin") return <Navigate to="/" replace />;
 
   return (
@@ -36,6 +35,10 @@ export default function AdminLayout() {
           <NavLink to="/admin/reviews" className="nav-link text-white">
             Reviews
           </NavLink>
+          <NavLink to="/admin/reports/top-reserved-boats" className="nav-link text-white">
+            Top Reserved Boats
+          </NavLink>
+          
           <button
             onClick={handleSubmit}
             className="btn btn-outline-light mt-3 text-start"

@@ -86,9 +86,9 @@ export default function AdminOrderDetails() {
             onChange={(e) => setStatus(e.target.value)}
           >
             <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="active">Active-Paid</option>
+            <option value="paid">Paid</option>
+            <option value="timed-out">Timed-out</option>
+            <option value="active">Active</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
