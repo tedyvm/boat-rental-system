@@ -69,8 +69,8 @@ export default function Boats({ isAdminView = false }) {
       try {
         setLoading(true);
         const baseUrl = isAdminView
-          ? "http://localhost:5000/api/admin/boats"
-          : "http://localhost:5000/api/boats/search";
+          ? `${import.meta.env.VITE_API_URL}/api/admin/boats`
+          : `${import.meta.env.VITE_API_URL}/api/boats/search`;
 
         const url = `${baseUrl}${location.search}`;
         const res = await fetch(url, {

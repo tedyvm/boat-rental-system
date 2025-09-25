@@ -10,7 +10,7 @@ export default function ReviewList({ boatId }) {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/reviews/boat/${boatId}`
+          `${import.meta.env.VITE_API_URL}/api/reviews/boat/${boatId}`
         );
         if (!res.ok) throw new Error("Failed to fetch reviews");
         const data = await res.json();

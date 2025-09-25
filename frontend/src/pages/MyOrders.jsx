@@ -14,7 +14,7 @@ export default function MyOrders() {
     const fetchReservations = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/reservations/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to load reservations");

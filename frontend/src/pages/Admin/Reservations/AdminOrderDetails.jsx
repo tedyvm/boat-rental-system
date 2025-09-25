@@ -16,7 +16,7 @@ export default function AdminOrderDetails() {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/admin/reservations?id=${id}`,
+          `${import.meta.env.VITE_API_URL}/api/admin/reservations?id=${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!res.ok) throw new Error("Failed to fetch order");
@@ -36,7 +36,7 @@ export default function AdminOrderDetails() {
   const handleStatusChange = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/reservations/${id}/status`,
+        `${import.meta.env.VITE_API_URL}/api/admin/reservations/${id}/status`,
         {
           method: "PUT",
           headers: {

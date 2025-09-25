@@ -40,7 +40,7 @@ export default function AvailabilityMenu({ onReserve, pricePerDay }) {
     async function fetchBookedDates() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/boats/${boatId}/booked-dates`
+          `${import.meta.env.VITE_API_URL}/api/boats/${boatId}/booked-dates`
         );
         if (!res.ok) throw new Error("Failed to fetch booked dates");
         const data = await res.json();

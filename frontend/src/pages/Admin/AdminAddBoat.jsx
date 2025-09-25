@@ -77,7 +77,7 @@ export default function AdminAddBoat() {
         pricePerDay: Number(boat.pricePerDay),
         capacity: Number(boat.capacity),
       };
-      const res = await fetch("http://localhost:5000/api/admin/boats", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/boats`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

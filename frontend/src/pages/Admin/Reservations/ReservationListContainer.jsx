@@ -42,7 +42,7 @@ export default function ReservationListContainer() {
         params.append("statuses", filters.statuses.join(","));
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/reservations?${params}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/reservations?${params}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
