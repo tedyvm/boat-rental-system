@@ -113,7 +113,16 @@ const createBoat = asyncHandler(async (req, res) => {
 });
 
 const getAllBoatsAdmin = asyncHandler(async (req, res) => {
-  const { name, location, type, status, sortField, sortDirection, page = 1, limit = 10 } = req.query;
+  const {
+    name,
+    location,
+    type,
+    status,
+    sortField,
+    sortDirection,
+    page = 1,
+    limit = 10,
+  } = req.query;
 
   const filter = {};
 
@@ -144,7 +153,6 @@ const getAllBoatsAdmin = asyncHandler(async (req, res) => {
     pages: Math.ceil(total / Number(limit)),
   });
 });
-
 
 const updateBoat = asyncHandler(async (req, res) => {
   const boat = await Boat.findById(req.params.id);
@@ -237,7 +245,6 @@ const getAllReservations = asyncHandler(async (req, res) => {
     totalPages: Math.ceil(total / limit),
   });
 });
-
 
 const updateReservationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
@@ -372,6 +379,42 @@ const deleteReviewAdmin = asyncHandler(async (req, res) => {
   res.json({ message: "Review removed successfully" });
 });
 
+//TOP BOATS
+// GET /api/admin/boats/most-revenue
+const getTopReservedBoats = asyncHandler(async (req, res) => {
+  const result = await Reservation.aggregate([
+    { $match: { status: "completed" } }, // skaičiuojam tik apmokėtas rezervacijas
+    {
+      $group: {
+        _id: "$boat",
+        totalRevenue: { $sum: "$totalPrice" },
+      },
+    },
+    { $sort: { totalRevenue: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: "boats",
+        localField: "_id",
+        foreignField: "_id",
+        as: "boat",
+      },
+    },
+    { $unwind: "$boat" },
+    {
+      $project: {
+        _id: 0,
+        boatId: "$boat._id",
+        name: "$boat.name",
+        type: "$boat.type",
+        totalRevenue: 1,
+      },
+    },
+  ]);
+
+  res.json({ boats: result });
+});
+
 module.exports = {
   createBoat,
   getAllBoatsAdmin,
@@ -387,4 +430,5 @@ module.exports = {
   getAllReviews,
   deleteReviewAdmin,
   deleteReservation,
+  getTopReservedBoats,
 };

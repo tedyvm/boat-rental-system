@@ -35,6 +35,10 @@ export default function AdminLayout() {
           <NavLink to="/admin/reviews" className="nav-link text-white">
             Reviews
           </NavLink>
+          <NavLink to="/admin/reports/top-reserved-boats" className="nav-link text-white">
+            Top Reserved Boats
+          </NavLink>
+          
           <button
             onClick={handleSubmit}
             className="btn btn-outline-light mt-3 text-start"

@@ -16,6 +16,7 @@ const {
   getUserById,
   getAllReviews,
   deleteReviewAdmin,
+  getTopReservedBoats,
 } = require("../controllers/adminController");
 
 // USERS
@@ -40,5 +41,8 @@ router.delete("/boats/:id", protect, admin, deleteBoat);
 // REVIEWS
 router.get("/reviews", protect, admin, getAllReviews);
 router.delete("/reviews/:id", protect, admin, deleteReviewAdmin);
+
+//Raports
+router.get("/reports/top-reserved-boats", protect, admin, getTopReservedBoats);
 
 module.exports = router;
