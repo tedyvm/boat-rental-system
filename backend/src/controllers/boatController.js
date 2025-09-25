@@ -36,7 +36,7 @@ const searchBoats = asyncHandler(async (req, res) => {
     cabinsMin,
     location,
     page = 1,
-    limit = 9, // default 9 per page
+    limit = 8, // default 8 per page
   } = req.query;
 
   const filter = { status: "published" };

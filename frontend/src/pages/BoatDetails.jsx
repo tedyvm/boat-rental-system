@@ -17,7 +17,7 @@ export default function BoatDetails() {
   useEffect(() => {
     async function fetchBoat() {
       try {
-        const res = await fetch(`http://localhost:5000/api/boats/${id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/boats/${id}`);
         if (!res.ok) throw new Error("Boat not found");
         const data = await res.json();
         setBoat(data);

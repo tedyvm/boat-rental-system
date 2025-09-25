@@ -23,7 +23,7 @@ export default function AdminUserEdit() {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch user");
@@ -59,7 +59,7 @@ export default function AdminUserEdit() {
       const payload = { ...form };
       if (!payload.password) delete payload.password; // jei tuščias, nesiunčiam
 
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

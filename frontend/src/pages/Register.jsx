@@ -17,7 +17,7 @@ export default function Register() {
   const onSubmit = async (data) => {
     try {
       setServerError("");
-      await axios.post("http://localhost:5000/api/auth/register", data);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, data);
       navigate("/login"); // redirect po sėkmingos registracijos
     } catch (err) {
       setServerError(err.response?.data?.message || "Registracija nepavyko");

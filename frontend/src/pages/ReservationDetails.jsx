@@ -22,7 +22,7 @@ export default function ReservationDetails() {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/reservations/${id}`,
+          `${import.meta.env.VITE_API_URL}/api/reservations/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -43,7 +43,7 @@ export default function ReservationDetails() {
   const fetchMyReview = async (boatId) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reviews/boat/${boatId}`
+        `${import.meta.env.VITE_API_URL}/api/reviews/boat/${boatId}`
       );
       if (!res.ok) return;
       const reviews = await res.json();
@@ -64,7 +64,7 @@ export default function ReservationDetails() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reservations/${reservation._id}`,
+        `${import.meta.env.VITE_API_URL}/api/reservations/${reservation._id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -93,7 +93,7 @@ export default function ReservationDetails() {
 
     try {
       setSubmitting(true);
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +127,7 @@ export default function ReservationDetails() {
     if (!window.confirm("Are you sure you want to delete your review?")) return;
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reviews/${myReview._id}`,
+        `${import.meta.env.VITE_API_URL}/api/reviews/${myReview._id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -147,7 +147,7 @@ export default function ReservationDetails() {
   function handlePayment() {
     try {
       // Simulate payment success
-      fetch(`http://localhost:5000/api/reservations/${reservation._id}/payment-success`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/reservations/${reservation._id}/payment-success`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
       });

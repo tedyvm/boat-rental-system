@@ -29,7 +29,7 @@ export default function ReservationEdit() {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/reservations/${id}`,
+          `${import.meta.env.VITE_API_URL}/api/reservations/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -83,7 +83,7 @@ export default function ReservationEdit() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/reservations/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

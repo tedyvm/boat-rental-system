@@ -43,7 +43,7 @@ export default function BoatListContainer() {
       console.log("🔎 Fetching boats:", params.toString());
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/boats?${params.toString()}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/boats?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!res.ok) throw new Error("Failed to fetch boats");
@@ -72,7 +72,7 @@ export default function BoatListContainer() {
   const toggleStatus = async (boat) => {
     const newStatus = boat.status === "published" ? "draft" : "published";
     try {
-      await fetch(`http://localhost:5000/api/admin/boats/${boat._id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/boats/${boat._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function BoatListContainer() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this boat?")) return;
     try {
-      await fetch(`http://localhost:5000/api/admin/boats/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/boats/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

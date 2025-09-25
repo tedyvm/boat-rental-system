@@ -36,7 +36,7 @@ export default function ReviewListContainer() {
       if (filters.user.trim()) params.append("user", filters.user);
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/reviews?${params}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/reviews?${params}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -62,7 +62,7 @@ export default function ReviewListContainer() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/reviews/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/reviews/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

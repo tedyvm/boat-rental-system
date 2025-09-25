@@ -26,7 +26,7 @@ export default function BoatFilters({ filters, onChange }) {
     async function fetchLimits() {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/boats/filter-limits"
+          `${import.meta.env.VITE_API_URL}/api/boats/filter-limits`
         );
         const data = await res.json();
 

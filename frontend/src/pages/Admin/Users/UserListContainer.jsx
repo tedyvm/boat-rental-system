@@ -41,7 +41,7 @@ export default function UserListContainer() {
       if (filters.role !== "all") params.append("role", filters.role);
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/users?${params}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/users?${params}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -65,7 +65,7 @@ export default function UserListContainer() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

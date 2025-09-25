@@ -17,7 +17,7 @@ export default function AvailabilityCalendar({
     const fetchBookedDates = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/boats/${boatId}/booked-dates`
+          `${import.meta.env.VITE_API_URL}/api/boats/${boatId}/booked-dates`
         );
         const data = await res.json();
         setBookedDates(data);

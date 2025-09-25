@@ -20,8 +20,8 @@ export default function Home() {
       try {
         // Gali naudoti savo esamą API
         const [sailingRes, catRes] = await Promise.all([
-          fetch("http://localhost:5000/api/boats/search?type=Sailing+Yacht"),
-          fetch("http://localhost:5000/api/boats/search?type=Catamaran"),
+          fetch(`${import.meta.env.VITE_API_URL}/api/boats/search?type=Sailing+Yacht`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/boats/search?type=Catamaran`),
         ]);
 
         if (!sailingRes.ok || !catRes.ok)

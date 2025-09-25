@@ -18,7 +18,7 @@ export default function AdminBoatDetails() {
     const fetchBoat = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:5000/api/admin/boats/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/boats/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch boat");
@@ -69,7 +69,7 @@ export default function AdminBoatDetails() {
     e.preventDefault();
     try {
       setSaving(true);
-      const res = await fetch(`http://localhost:5000/api/admin/boats/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/boats/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
