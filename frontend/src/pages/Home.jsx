@@ -9,8 +9,8 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [counts, setCounts] = useState({
-    sailingYacht: 0,
-    catamaran: 0,
+    sailingYacht: null,
+    catamaran: null,
   });
   const [filters, setFilters] = useState({});
 
@@ -18,10 +18,15 @@ export default function Home() {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        // Gali naudoti savo esamą API
         const [sailingRes, catRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/boats/search?type=Sailing+Yacht`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/boats/search?type=Catamaran`),
+          fetch(
+            `${
+              import.meta.env.VITE_API_URL
+            }/api/boats/search?type=Sailing+Yacht`
+          ),
+          fetch(
+            `${import.meta.env.VITE_API_URL}/api/boats/search?type=Catamaran`
+          ),
         ]);
 
         if (!sailingRes.ok || !catRes.ok)
@@ -31,8 +36,8 @@ export default function Home() {
         const catData = await catRes.json();
 
         setCounts({
-          sailingYacht: sailingData.length,
-          catamaran: catData.length,
+          sailingYacht: sailingData.total,
+          catamaran: catData.total,
         });
       } catch (err) {
         console.error("Error fetching counts:", err);

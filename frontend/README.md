@@ -1,12 +1,52 @@
-# React + Vite
+# Boat Rental System (MERN)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Pilnas **MERN** (MongoDB, Express, React, Node.js) projektas laivų nuomos sistemai.  
+Sistema leidžia vartotojams ieškoti, filtruoti, rezervuoti ir apmokėti laivų nuomas, o administratoriams – valdyti laivus, vartotojus, rezervacijas ir peržiūrėti statistiką.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Funkcionalumas
 
-## Expanding the ESLint configuration
+### Vartotojas
+- **Autentifikacija:** prisijungimas, registracija, JWT tokenai
+- **Laivų paieška ir filtrai:** pagal tipą, datą, metus, kainą, ilgį, kajutes, talpą, reitingą
+- **Laivo detalės puslapis:** kalendorius su laisvomis dienomis, nuotraukų galerija
+- **Rezervacijos:**
+  - Rezervacijų peržiūra
+  - Atšaukimas (tik nepatvirtintoms rezervacijoms)
+  - Testinis apmokėjimas
+  - Automatinis atšaukimas, jei neapmokėta per 3 d.
+- **Atsiliepimai:**
+  - Komentarą gali palikti tik vartotojas, kuris turi **užbaigtą (completed)** rezervaciją tam laivui
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Administratorius
+- **Laivai:** sąrašo peržiūra su filtracija, redagavimas, naujo laivo įkėlimas
+- **Rezervacijos:** sąrašo peržiūra, filtravimas, statuso keitimas
+- **Vartotojai:** sąrašo peržiūra su filtracija, redagavimas
+- **Atsiliepimai:** peržiūra su filtracija, trynimas
+- **Ataskaitos:** top labiausiai pajamas generuojančių laivų raportas
+
+---
+
+## Pagrindinės technologijos
+
+### Frontend
+- **React (Vite)** – pagrindinė UI biblioteka
+- **React Router v6** – maršrutizavimas
+- **Bootstrap 5** – stilistika, komponentai (`Button`, `Offcanvas`, kt.)
+- **react-hook-form** – formų valdymas
+- **axios / fetch** – API užklausos
+- **rc-slider** – filtrų slankikliai
+- **react-date-range** – datų pasirinkimas kalendoriuje
+- **react-image-gallery** – nuotraukų galerija
+
+### Backend
+- **Node.js + Express** – REST API
+- **Mongoose** – MongoDB ODM
+- **JWT (jsonwebtoken)** – autentifikacija
+- **express-async-handler** – klaidų valdymas
+- **cors** – CORS konfigūracija
+- **node-cron** – automatizuotas rezervacijų atšaukimas
+
+
+
