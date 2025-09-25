@@ -9,10 +9,9 @@ export default function AdminLayout() {
 
   const handleSubmit = () => {
     logout();
-    navigate("/");
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   if (user.role !== "admin") return <Navigate to="/" replace />;
 
   return (

@@ -127,15 +127,12 @@ const cancelReservation = asyncHandler(async (req, res) => {
 
 //PAYMENT route for TEST
 const paymentSuccess = asyncHandler(async (req, res) => {
-  const newStatus = "approved";
-  const allowed = ["approved", "rejected", "active", "completed", "cancelled"];
-
+  const newStatus = "paid";
   const reservation = await Reservation.findById(req.params.id);
   if (!reservation) {
     res.status(404);
     throw new Error("Reservation not found");
   }
-
   reservation.status = newStatus;
   await reservation.save();
   res.json(reservation);

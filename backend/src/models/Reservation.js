@@ -63,7 +63,7 @@ reservationSchema.index({ boat: 1, startDate: 1, endDate: 1, status: 1 });
 reservationSchema.statics.hasConflict = function (boatId, start, end) {
   return this.exists({
     boat: boatId,
-    status: { $in: ["pending", "approved", "active", "completed", "cancelled", "rejected"] },
+    status: { $in: ["pending", "paid", "active", "completed", "cancelled", "timed-out"] },
     startDate: { $lte: end },
     endDate: { $gte: start },
   });

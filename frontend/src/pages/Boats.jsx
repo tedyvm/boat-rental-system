@@ -18,7 +18,7 @@ export default function Boats({ isAdminView = false }) {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [boatsPerPage, setBoatsPerPage] = useState(9);
+  const [boatsPerPage, setBoatsPerPage] = useState(8);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
@@ -35,7 +35,7 @@ export default function Boats({ isAdminView = false }) {
   const searchParams = new URLSearchParams(location.search);
   const currentSort = searchParams.get("sort");
 
-  // ✅ Sinchronizuojam URL kai pasikeičia filters / sort / pagination
+  //Sinchronizuojam URL kai pasikeičia filters / sort / pagination
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -63,7 +63,7 @@ export default function Boats({ isAdminView = false }) {
     setCurrentPage(1);
   };
 
-  // ✅ Fetchinam kai pasikeičia URL
+  // Fetchinam kai pasikeičia URL
   useEffect(() => {
     const fetchBoats = async () => {
       try {

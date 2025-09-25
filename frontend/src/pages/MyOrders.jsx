@@ -63,7 +63,7 @@ export default function MyOrders() {
                 <td>
                   <span
                     className={`badge ${
-                      r.status === "approved"
+                      r.status === "paid"
                         ? "bg-success"
                         : r.status === "pending"
                         ? "bg-warning text-dark"

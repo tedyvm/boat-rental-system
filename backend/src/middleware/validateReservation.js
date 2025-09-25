@@ -42,7 +42,7 @@ const validateReservation = async (req, res, next) => {
     // Tikrinam konfliktus, išskyrus redaguojamą rezervaciją
     const conflict = await Reservation.findOne({
       boat: boatId,
-      status: { $in: ["pending", "approved", "active"] },
+      status: { $in: ["pending", "paid", "active"] },
       startDate: { $lte: end },
       endDate: { $gte: start },
       ...(req.params.id ? { _id: { $ne: req.params.id } } : {}), // <- išskiriam savo rezervaciją

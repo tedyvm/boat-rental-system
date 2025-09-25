@@ -1,5 +1,5 @@
 export default function ReservationSearchBar({ filters, setFilters }) {
-  const statuses = ["pending", "approved", "rejected", "active", "completed", "cancelled"];
+  const statuses = ["pending", "paid", "timed-out", "active", "completed", "cancelled"];
 
   const toggleStatus = (status) => {
     setFilters((f) => ({

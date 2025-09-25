@@ -242,8 +242,8 @@ const getAllReservations = asyncHandler(async (req, res) => {
 const updateReservationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const allowed = [
-    "approved",
-    "rejected",
+    "paid",
+    "timed-out",
     "active",
     "completed",
     "cancelled",
@@ -272,11 +272,11 @@ const deleteReservation = asyncHandler(async (req, res) => {
     throw new Error("Reservation not found");
   }
 
-  // Leidžiame trinti tik completed, cancelled arba rejected
-  if (!["completed", "cancelled", "rejected"].includes(reservation.status)) {
+  // Leidžiame trinti tik completed, cancelled arba timed-out
+  if (!["completed", "cancelled", "timed-out"].includes(reservation.status)) {
     res.status(400);
     throw new Error(
-      "Only completed, cancelled or rejected reservations can be deleted"
+      "Only completed, cancelled or timed-out reservations can be deleted"
     );
   }
 
